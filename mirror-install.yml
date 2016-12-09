@@ -1,0 +1,11 @@
+---
+- name: Installs stuff for hosting static files
+  hosts: mirrors
+  gather_facts: no
+  vars_files:
+    - artifacting-vars.yml
+  tasks:
+    - name: Always have a webserver up to date
+      package:
+        name: nginx
+        state: latest

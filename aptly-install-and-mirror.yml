@@ -1,0 +1,33 @@
+# Before going further, make sure you have keys.
+#    gpg --gen-key
+#    mkdir -p /openstack/aptly
+#    gpg --export-secret-keys --armor CB6E9D87 > /openstack/aptly.private.key
+#    gpg --export --armor CB6E9D87 > /openstack/aptly.private.key
+- name: Install aptly
+  hosts: aptly_cache[0]
+  vars_files:
+    - artifacting-vars.yml
+  roles:
+    - infOpen.aptly
+  post_tasks:
+    - include_vars: /etc/ansible/roles/rabbitmq_server/vars/debian.yml
+      failed_when: false
+    - name: Verify if rabbitmq is already there
+      command: su - aptly -c "apty package search 'Name (rabbitmq-server), Version ({{ _rabbitmq_package_version }})'"
+      register: rabbitmq_search
+    - name: Fetch Rabbitmq to feed frozen repo
+      get_url:
+        # from: https://raw.githubusercontent.com/openstack/openstack-ansible-rabbitmq_server/stable/newton/vars/debian.yml
+        url: "{{ _rabbitmq_package_url | default('http://www.rabbitmq.com/releases/rabbitmq-server/v3.6.5/rabbitmq-server_3.6.5-1_all.deb') }}"
+        dest: "/tmp/{{ _rabbitmq_package_url | basename | default('rabbitmq-server_3.6.5-1_all.deb') }}"
+        sha256sum: "{{ _rabbitmq_package_sha256 | default('9de570ca9e3d30bdc26a79c683503e158d35e5cacafb36e4e9b01d73929bf5a9') }}"
+      when: rabbitmq_search.stdout.find(_rabbitmq_package_version) == -1
+      register: rabbitmq_download
+      until: rabbitmq_download|success
+      retries: 5
+      delay: 5
+    - name: Upload Package
+      command: su - aptly -c "aptly repo add rabbitmq-downloaded-packages-ALL /tmp/{{ _rabbitmq_package_url | basename | default('rabbitmq-server_3.6.5-1_all.deb') }}"
+      register: aptly_repo_add_output
+      when: rabbitmq_search.stdout.find(_rabbitmq_package_version) == -1
+    - debug: var=aptly_repo_add_output

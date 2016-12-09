@@ -1,0 +1,29 @@
+
+- name: Create snapshot for the release
+  hosts: aptly_cache[0]
+  gather_facts: no
+  vars_files:
+    - artifacting-vars.yml
+    - aptly-skip-vars.yml
+  become_user: aptly
+  become: True
+  become_method: sudo
+  tasks:
+    - assert:
+        that:
+          openstack_release is defined
+        msg: You need to define what you are releasing!
+    - shell: "aptly {{ item }} list -raw | grep -e {{ ansible_distribution_release }} -e ALL {% if aptly_dont_snapshot_list is defined and aptly_dont_snapshot_list | length > 0 %}|grep -v -e {{ aptly_dont_snapshot_list | join(' -e ') }} {% endif %}"
+      with_items:
+        - repo
+        - mirror
+      register: aptly_repo_list
+    - name: Froze the mirrors/repos by snapshot creation
+      shell: "aptly snapshot create slushie-{{ ansible_distribution_release }}-{{ openstack_release }}-{{ item.1 }} from {{ item.0.item }} {{ item.1 }}"
+      with_subelements:
+        - "{{ aptly_repo_list.results }}"
+        - "stdout_lines"
+    - shell: "aptly snapshot list -raw | grep slushie-{{ ansible_distribution_release }}-{{ openstack_release }}"
+      register: aptly_snapshot_list
+    - debug:
+        msg: "Full list of snapshots for this distribution/openstack_release: {{ aptly_snapshot_list.stdout_lines }}"

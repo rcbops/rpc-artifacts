@@ -1,0 +1,15 @@
+- name: Sync to mirror
+  hosts: mirrors
+  vars_files:
+    - artifacting-vars.yml
+  tasks:
+    - name: Synchronize cache
+      synchronize:
+        src: "{{ aptly_user_home }}/public/"
+        dest: "{{ artifacts_root_folder }}/apt/"
+      delegate_to: aptly_cache[0]
+      register: synchronize
+      until: synchronize|success
+      retries: 5
+      delay: 5
+      failed_when: false
