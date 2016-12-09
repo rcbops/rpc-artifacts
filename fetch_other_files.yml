@@ -1,0 +1,38 @@
+---
+- name: Fetches files for rackspace mirror that aren't pip/apt/containers
+  hosts: mirrors
+  gather_facts: no
+  vars_files:
+    - artifacting-vars.yml
+  tasks:
+    - name: Preparing the local folder for these files
+      local_action: file
+      args:
+        path: "{{ fetch_local_temp_storage }}"
+        state: directory
+    - name: Where are the things I want to fetch and publish later?
+      local_action: get_url
+      args:
+        url: "{{ item.1 }}"
+        dest: "{{ fetch_local_temp_storage }}/include_vars_{{ item.0 }}.yml"
+      with_indexed_items: "{{ fetch_information_sources }}"
+    - include_vars: "{{ item }}"
+      with_fileglob: "{{ fetch_local_temp_storage }}/include_vars_*"
+    - name: Ensuring we can store the downloads
+      file:
+        path: "{{ fetch_artifact_destination_folder }}"
+        state: directory
+    - name: Fetch now
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ fetch_artifact_destination_folder }}"
+        checksum: "{{ item.checksum | default(omit) }}"
+      register: fetched_links
+      until: fetched_links|success
+      retries: 5
+      delay: 5
+      with_items:
+        - url: "{{ swift_pypy_archive.url }}"
+          checksum: "sha256:{{ swift_pypy_archive.sha256 }}"
+        - url: "{{ tempest_img_url }}"
+          checksum: "sha256:{{ tempest_images.0.sha256 }}"

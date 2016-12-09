@@ -1,0 +1,10 @@
+[ci-job-target]
+jenkins-child ansible_connection=local
+
+[mirrors]
+mirror1 ansible_conneciton=local
+
+#Group used for building cache/building snapshots/publishing them.
+# Maybe worth giving the mirror as first entry!
+[aptly_cache]
+localhost ansible_connection=local

@@ -1,0 +1,181 @@
+---
+# Artifacts root folder
+artifacts_root_folder: "/openstack/artifcats"
+
+# External files to download for tempest and swift (cirros/pypy)
+fetch_version: "master"
+fetch_information_sources:
+  - "https://raw.githubusercontent.com/openstack/openstack-ansible-os_swift/{{ fetch_version }}/defaults/main.yml"
+  - "https://raw.githubusercontent.com/openstack/openstack-ansible-os_tempest/{{ fetch_version }}/defaults/main.yml"
+fetch_local_temp_storage: "/tmp/download_other_artifacts"
+fetch_artifact_destination_folder: "{{ artifacts_root_folder }}/downloads/"
+
+# Aptly vars
+# Before going further, make sure you have keys.
+#    gpg --gen-key
+#    mkdir -p /openstack/aptly
+#    gpg --export-secret-keys --armor CB6E9D87 > /openstack/aptly.private.key
+#    gpg --export --armor CB6E9D87 > /openstack/aptly.private.key
+aptly_custom_gpg_key_file : /openstack/aptly.private.key
+aptly_custom_gpg_key_id   : C13A735A
+aptly_system_archive_gpg_keys_import: True
+aptly_user_home: "/openstack/aptly"
+aptly_architectures:
+  - amd64
+  - i386
+#  - ppc64el
+aptly_dependency_follow_suggests: True
+aptly_mirror_do_updates: True
+aptly_mirrors:
+  - name: ubuntu-xenial
+    archive_url: http://mirror.rackspace.com/ubuntu
+    distribution: xenial
+    component1:
+      - main
+      - restricted
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    state: "present"
+    gpg:
+      key: "C0B21F32 437D05B5"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    do_update: True
+  - name: uca-newton-updates-xenial
+    archive_url: http://ubuntu-cloud.archive.canonical.com/ubuntu
+    distribution: xenial-updates/newton
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "EC4926EA"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: True
+  - name: mariadb-10.0-trusty
+    archive_url: http://mirror.rackspace.com/mariadb/repo/10.0/ubuntu
+    distribution: trusty
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "cbcb082a1bb943db"
+      #key: "0xcbcb082a1bb943db"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: True
+  - name: mariadb-10.0-xenial
+    archive_url: http://mirror.rackspace.com/mariadb/repo/10.0/ubuntu
+    distribution: xenial
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "F1656F24C74CD1D8"
+      #key: "0xcbcb082a1bb943db"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: True
+  - name: percona-trusty
+    archive_url: http://repo.percona.com/apt
+    distribution: trusty
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "9334a25f8507efa5"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: True
+  - name: percona-xenial
+    archive_url: http://repo.percona.com/apt
+    distribution: xenial
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "9334a25f8507efa5"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: True
+  - name: haproxy-trusty
+    archive_url: http://ppa.launchpad.net/vbernat/haproxy-1.5/ubuntu
+    distribution: trusty
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "cffb779aadc995e4f350a060505d97a41c61b9cd"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: True
+  # Rabbitmq:
+  # Got the key from:
+  # wget https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+  # gpg --list-packets rabbitmq-release-signing-key.asc
+  - name: rabbitmq-upstream-testing-branch-mirror-ALL
+    archive_url: http://www.rabbitmq.com/debian/
+    distribution: testing
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "6B73A36E6026DFCA"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: True
+# # POWERVM ONLY
+# - name: novalink-powervm
+#   archive_url: http://public.dhe.ibm.com/systems/virtualization/Novalink/debian
+#   distribution: novalink_1.0.0
+#   component1:
+#     - non-free
+#   state: "present"
+#   gpg:
+#     key: "cffb779aadc995e4f350a060505d97a41c61b9cd"
+#     server: "hkp://keyserver.ubuntu.com:80"
+#     keyring: "trustedkeys.gpg"
+#   create_flags:
+#     - "-keyring='trustedkeys.gpg'"
+#   update_flags:
+#     - "-keyring='trustedkeys.gpg'"
+#   do_update: True
+
+# For rabbitmq frozen
+aptly_repos:
+  - name: "rabbitmq-downloaded-packages-ALL"
+    create_flags:
+      - '-comment="RabbitMQ Downloaded packages from RabbitMQ repo"'
+    state: 'present'
+# NON APTLY ROLE
+aptly_snapshot_merge: True
