@@ -3,14 +3,19 @@
 #    mkdir -p /openstack/aptly
 #    gpg --export-secret-keys --armor CB6E9D87 > /openstack/aptly.private.key
 #    gpg --export --armor CB6E9D87 > /openstack/aptly.private.key
-- name: Fetch aptly role requirements
+- name: Prepare before aptly-install-and-mirror playbook
   hosts: localhost
   connection: local
   vars_files:
     - artifacting-vars.yml
   tasks:
-    - git:
+    - name: Fetch aptly role and rabbitmq vars files
+      git:
         repo: "{{ item.repo }}"
         dest: "{{ item.dest }}"
         version: "{{ item.version | default('master') }}"
       with_items: "{{ aptly_clone_this_first }}"
+      register: git_clone
+      until: git_clone | success
+      retries: 2
+      delay: 5
