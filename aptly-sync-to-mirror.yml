@@ -6,7 +6,7 @@
     - name: Synchronize cache
       synchronize:
         src: "{{ aptly_user_home }}/public/"
-        dest: "{{ artifacts_root_folder }}/apt/"
+        dest: "{{ artifacts_aptrepos_dest_folder }}"
       delegate_to: aptly_cache[0]
       register: synchronize
       until: synchronize|success
