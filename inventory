@@ -2,7 +2,7 @@
 jenkins-child ansible_connection=local
 
 [mirrors]
-mirror1 ansible_conneciton=local
+mirror1 ansible_connection=local
 
 #Group used for building cache/building snapshots/publishing them.
 # Maybe worth giving the mirror as first entry!
