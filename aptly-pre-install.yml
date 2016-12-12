@@ -2,7 +2,7 @@
 #    gpg --gen-key
 #    mkdir -p /openstack/aptly
 #    gpg --export-secret-keys --armor CB6E9D87 > /openstack/aptly.private.key
-#    gpg --export --armor CB6E9D87 > /openstack/aptly.private.key
+#    gpg --export --armor CB6E9D87 > /openstack/aptly.public.key
 - name: Prepare before aptly-install-and-mirror playbook
   hosts: localhost
   connection: local
