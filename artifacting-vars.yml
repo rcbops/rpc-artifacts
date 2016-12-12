@@ -17,7 +17,7 @@ aptly_clone_this_first:
   - repo: https://github.com/openstack/openstack-ansible-rabbitmq_server.git
     dest: "{{ ansible_roles_folder }}/rabbitmq_server"
     version: "stable/newton"
-  - repo: "https://github.com/evrardjp/ansible-role-aptly"
+  - repo: "https://github.com/evrardjp/ansible-role-aptly.git"
     dest: "{{ ansible_roles_folder }}/infOpen.aptly"
     version: "rax"
 
