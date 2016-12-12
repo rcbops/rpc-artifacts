@@ -10,7 +10,7 @@
   roles:
     - infOpen.aptly
   post_tasks:
-    - include_vars: "{{ rabbitmq_dest_folder }}/vars/debian.yml"
+    - include_vars: "{{ ansible_roles_folder }}/rabbitmq_server/vars/debian.yml"
       failed_when: false
     - name: Verify if rabbitmq is already there
       command: su - aptly -c "apty package search 'Name (rabbitmq-server), Version ({{ _rabbitmq_package_version }})'"

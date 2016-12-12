@@ -3,6 +3,7 @@
 artifacts_root_folder: "/openstack/artifcats"
 artifacts_aptrepos_dest_folder: "{{ artifacts_root_folder }}/apt/"
 fetch_artifact_destination_folder: "{{ artifacts_root_folder }}/downloads/"
+ansible_roles_folder: "/etc/ansible/roles"
 
 # External files to download for tempest and swift (cirros/pypy)
 fetch_version: "master"
@@ -14,12 +15,11 @@ fetch_local_temp_storage: "/tmp/download_other_artifacts"
 # Prepare for aptly, repos to clone.
 aptly_clone_this_first:
   - repo: https://github.com/openstack/openstack-ansible-rabbitmq_server.git
-    dest: "{{ rabbitmq_dest_folder }}"
+    dest: "{{ ansible_roles_folder }}/rabbitmq_server"
     version: "stable/newton"
   - repo: "https://github.com/evrardjp/ansible-role-aptly"
-    dest: "/etc/ansible/roles/infOpen.aptly"
+    dest: "{{ ansible_roles_folder }}/infOpen.aptly"
     version: "rax"
-rabbitmq_dest_folder: "/etc/ansible/roles/rabbitmq_server"
 
 # Aptly vars
 # Before going further, make sure you have keys.
