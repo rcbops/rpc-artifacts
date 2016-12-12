@@ -7,6 +7,8 @@
   hosts: aptly_cache[0]
   vars_files:
     - artifacting-vars.yml
+  vars:
+    rabbitmq_package_url: "{{ _rabbitmq_package_url }}"
   roles:
     - infOpen.aptly
   post_tasks:
@@ -15,6 +17,8 @@
     - name: Verify if rabbitmq is already there
       command: su - aptly -c "aptly package search 'Name (rabbitmq-server), Version ({{ _rabbitmq_package_version }})'"
       register: rabbitmq_search
+      failed_when: false
+      changed_when: false
     - name: Fetch Rabbitmq to feed frozen repo
       get_url:
         # from: https://raw.githubusercontent.com/openstack/openstack-ansible-rabbitmq_server/stable/newton/vars/debian.yml
