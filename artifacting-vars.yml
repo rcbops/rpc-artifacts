@@ -1,6 +1,8 @@
 ---
-# Artifacts root folder
+# Artifacts folders
 artifacts_root_folder: "/openstack/artifcats"
+artifacts_aptrepos_dest_folder: "{{ artifacts_root_folder }}/apt/"
+fetch_artifact_destination_folder: "{{ artifacts_root_folder }}/downloads/"
 
 # External files to download for tempest and swift (cirros/pypy)
 fetch_version: "master"
@@ -8,7 +10,6 @@ fetch_information_sources:
   - "https://raw.githubusercontent.com/openstack/openstack-ansible-os_swift/{{ fetch_version }}/defaults/main.yml"
   - "https://raw.githubusercontent.com/openstack/openstack-ansible-os_tempest/{{ fetch_version }}/defaults/main.yml"
 fetch_local_temp_storage: "/tmp/download_other_artifacts"
-fetch_artifact_destination_folder: "{{ artifacts_root_folder }}/downloads/"
 
 # Aptly vars
 # Before going further, make sure you have keys.
