@@ -11,6 +11,11 @@ fetch_information_sources:
   - "https://raw.githubusercontent.com/openstack/openstack-ansible-os_tempest/{{ fetch_version }}/defaults/main.yml"
 fetch_local_temp_storage: "/tmp/download_other_artifacts"
 
+# Prepare for apt mirror: fetching the packages for rabbit
+rabbitmq_repo_url: https://github.com/openstack/openstack-ansible-rabbitmq_server.git
+rabbitmq_dest_folder: "/etc/ansible/roles/rabbitmq_server"
+rabbitmq_version: "stable/newton"
+
 # Aptly vars
 # Before going further, make sure you have keys.
 #    gpg --gen-key
