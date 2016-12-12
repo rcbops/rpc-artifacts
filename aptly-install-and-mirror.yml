@@ -10,10 +10,6 @@
   roles:
     - infOpen.aptly
   post_tasks:
-    - git:
-        repo: "{{ rabbitmq_repo_url }}"
-        dest: "{{ rabbitmq_dest_folder }}"
-        version: "{{ rabbitmq_version }}"
     - include_vars: "{{ rabbitmq_dest_folder }}/vars/debian.yml"
       failed_when: false
     - name: Verify if rabbitmq is already there

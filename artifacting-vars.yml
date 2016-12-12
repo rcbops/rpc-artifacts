@@ -11,10 +11,15 @@ fetch_information_sources:
   - "https://raw.githubusercontent.com/openstack/openstack-ansible-os_tempest/{{ fetch_version }}/defaults/main.yml"
 fetch_local_temp_storage: "/tmp/download_other_artifacts"
 
-# Prepare for apt mirror: fetching the packages for rabbit
-rabbitmq_repo_url: https://github.com/openstack/openstack-ansible-rabbitmq_server.git
+# Prepare for aptly, repos to clone.
+aptly_clone_this_first:
+  - repo: https://github.com/openstack/openstack-ansible-rabbitmq_server.git
+    dest: "{{ rabbitmq_dest_folder }}"
+    version: "stable/newton"
+  - repo: "https://github.com/evrardjp/ansible-role-aptly"
+    dest: "/etc/ansible/roles/infOpen.aptly"
+    version: "rax"
 rabbitmq_dest_folder: "/etc/ansible/roles/rabbitmq_server"
-rabbitmq_version: "stable/newton"
 
 # Aptly vars
 # Before going further, make sure you have keys.
