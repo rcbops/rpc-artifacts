@@ -1,33 +1,35 @@
 - name: Publish Aptly Mirror
-  hosts: aptly_cache[0]
+  hosts: localhost
+  connection: local
   gather_facts: no
   vars_files:
     - artifacting-vars.yml
     - aptly-skip-vars.yml
+    - aptly-vars.yml
   become_user: aptly
   become: True
   become_method: sudo
   tasks:
     - assert:
         that:
-          - openstack_release is defined
+          - artifacts_version is defined
           - distribution_release is defined
         msg: You need to define what you are releasing!
-    - shell: "aptly snapshot list -raw | grep slushie-{{ distribution_release }}-{{ openstack_release }} {% if aptly_dont_merge_snapshot_list is defined and aptly_dont_merge_snapshot_list | length > 0 %}|grep -v -e {{ aptly_dont_merge_snapshot_list | join(' -e ') }} {% endif %}"
+    - shell: "aptly snapshot list -raw | grep slushie-{{ distribution_release }}-{{ artifacts_version }} {% if aptly_dont_merge_snapshot_list is defined and aptly_dont_merge_snapshot_list | length > 0 %}|grep -v -e {{ aptly_dont_merge_snapshot_list | join(' -e ') }} {% endif %}"
       register: aptly_selected_snapshot_list
     - name: Merge the snapshots together
-      shell: "aptly snapshot merge slushie-{{ distribution_release }}-{{ openstack_release }} {{ aptly_selected_snapshot_list.stdout_lines | join(' ') }}"
+      shell: "aptly snapshot merge slushie-{{ distribution_release }}-{{ artifacts_version }} {{ aptly_selected_snapshot_list.stdout_lines | join(' ') }}"
       when: (aptly_snapshot_merge | default(True)) | bool
       tags:
         - aptly_snapshot_merge
         - aptly_snapshot
     - name: Publish snapshot into public folder
-      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" slushie-{{ distribution_release }}-{{ openstack_release }} {{ openstack_release }}'
+      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" slushie-{{ distribution_release }}-{{ artifacts_version }} {{ artifacts_version }}'
       when: (aptly_snapshot_merge | default(True)) | bool
       tags:
         - aptly_publish
     - name: Publish snapshot into public folder (no merge)
-      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" {{ item }} {{ openstack_release }}/{{ item }}'
+      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" {{ item }} {{ artifacts_version }}/{{ item }}'
       with_items: "{{ aptly_selected_snapshot_list.stdout_lines }}"
       when: not (aptly_snapshot_merge | default(True)) | bool
       tags:

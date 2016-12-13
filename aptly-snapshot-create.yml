@@ -1,17 +1,19 @@
 
 - name: Create snapshot for the release
-  hosts: aptly_cache[0]
+  hosts: localhost
+  connection: local
   gather_facts: no
   vars_files:
     - artifacting-vars.yml
     - aptly-skip-vars.yml
+    - aptly-vars.yml
   become_user: aptly
   become: True
   become_method: sudo
   tasks:
     - assert:
         that:
-          - openstack_release is defined
+          - artifacts_version is defined
           - distribution_release is defined
         msg: You need to define what you are releasing!
     - shell: "aptly {{ item }} list -raw | grep -e {{ distribution_release }} -e ALL {% if aptly_dont_snapshot_list is defined and aptly_dont_snapshot_list | length > 0 %}|grep -v -e {{ aptly_dont_snapshot_list | join(' -e ') }} {% endif %}"
@@ -19,12 +21,25 @@
         - repo
         - mirror
       register: aptly_repo_list
-    - name: Froze the mirrors/repos by snapshot creation
-      shell: "aptly snapshot create slushie-{{ distribution_release }}-{{ openstack_release }}-{{ item.1 }} from {{ item.0.item }} {{ item.1 }}"
+    - name: Prepare re-building of snapshots
+      shell: "aptly {{ item }} list -raw | grep slushie-{{ distribution_release }}-{{ artifacts_version }}"
+      with_items:
+        - repo
+        - mirror
+      register: aptly_existing_snapshots_list
+      when: "{{ lookup('ENV','RECREATE_SNAPSHOTS') }} == 'YES' "
+    - name: Delete old snapshots for this distro/artifacts version
+      shell: "aptly snapshot drop {{ item.1 }} "
       with_subelements:
         - "{{ aptly_repo_list.results }}"
         - "stdout_lines"
-    - shell: "aptly snapshot list -raw | grep slushie-{{ distribution_release }}-{{ openstack_release }}"
+      when: "{{ lookup('ENV','RECREATE_SNAPSHOTS') }} == 'YES' "
+    - name: Froze the mirrors/repos by snapshot creation
+      shell: "aptly snapshot create slushie-{{ distribution_release }}-{{ artifacts_version }}-{{ item.1 }} from {{ item.0.item }} {{ item.1 }}"
+      with_subelements:
+        - "{{ aptly_repo_list.results }}"
+        - "stdout_lines"
+    - shell: "aptly snapshot list -raw | grep slushie-{{ distribution_release }}-{{ artifacts_version }}"
       register: aptly_snapshot_list
     - debug:
         msg: "Full list of snapshots for this distribution/openstack_release: {{ aptly_snapshot_list.stdout_lines }}"
