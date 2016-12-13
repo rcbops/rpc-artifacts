@@ -1,31 +1,41 @@
 ---
 - name: Fetches files for rackspace mirror that aren't pip/apt/containers
-  hosts: mirrors
+  hosts: localhost
+  connection: local
   gather_facts: no
   vars_files:
     - artifacting-vars.yml
+  vars:
+    artifacts_extradownloads_clone_this_first:
+      - repo: "https://github.com/openstack/openstack-ansible-os_swift.git"
+        dest: "{{ ansible_roles_folder }}/os_swift"
+        version: "{{ roles_sha | selectattr('name','equalto', 'os_swift') | list | map(attribute='version') | list }}"
+      - repo: "https://github.com/openstack/openstack-ansible-os_tempest.git"
+        dest: "{{ ansible_roles_folder }}/os_tempest"
+        version: "{{ roles_sha | selectattr('name','equalto', 'os_tempest') | list | map(attribute='version') | list }}"
   tasks:
-    - name: Preparing the local folder for these files
-      local_action: file
-      args:
-        path: "{{ fetch_local_temp_storage }}"
-        state: directory
-    - name: Where are the things I want to fetch and publish later?
-      local_action: get_url
-      args:
-        url: "{{ item.1 }}"
-        dest: "{{ fetch_local_temp_storage }}/include_vars_{{ item.0 }}.yml"
-      with_indexed_items: "{{ fetch_information_sources }}"
+    - name: Fetch roles to find what to download
+      git:
+        repo: "{{ item.repo }}"
+        dest: "{{ item.dest }}"
+        version: "{{ item.version | default('master') }}"
+      with_items: "{{ artifacts_extradownloads_clone_this_first }}"
+      register: git_clone
+      until: git_clone | success
+      retries: 2
+      delay: 5
     - include_vars: "{{ item }}"
-      with_fileglob: "{{ fetch_local_temp_storage }}/include_vars_*"
+      with_items:
+        - "{{ ansible_roles_folder }}/os_swift/defaults/main.yml" 
+        - "{{ ansible_roles_folder }}/os_tempest/defaults/main.yml" 
     - name: Ensuring we can store the downloads
       file:
-        path: "{{ fetch_artifact_destination_folder }}"
+        path: "{{ artifact_extradownloads_dest_folder }}"
         state: directory
     - name: Fetch now
       get_url:
         url: "{{ item.url }}"
-        dest: "{{ fetch_artifact_destination_folder }}"
+        dest: "{{ artifact_extradownloads_dest_folder }}"
         checksum: "{{ item.checksum | default(omit) }}"
       register: fetched_links
       until: fetched_links|success

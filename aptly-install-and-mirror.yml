@@ -4,9 +4,11 @@
 #    gpg --export-secret-keys --armor CB6E9D87 > /openstack/aptly.private.key
 #    gpg --export --armor CB6E9D87 > /openstack/aptly.public.key
 - name: Install aptly
-  hosts: aptly_cache[0]
+  hosts: localhost
+  connection: local
   vars_files:
     - artifacting-vars.yml
+    - aptly-vars.yml
   vars:
     rabbitmq_package_url: "{{ _rabbitmq_package_url }}"
   roles:
@@ -31,7 +33,7 @@
       retries: 5
       delay: 5
     - name: Upload Package
-      command: su - aptly -c "aptly repo add rabbitmq-downloaded-packages-ALL /tmp/{{ _rabbitmq_package_url | basename | default('rabbitmq-server_3.6.5-1_all.deb') }}"
+      command: su - aptly -c "aptly repo add rabbitmq-downloaded-packages-{{ artifacts_version }}-ALL /tmp/{{ _rabbitmq_package_url | basename | default('rabbitmq-server_3.6.5-1_all.deb') }}"
       register: aptly_repo_add_output
       when: rabbitmq_search.stdout.find(_rabbitmq_package_version) == -1
     - debug: var=aptly_repo_add_output

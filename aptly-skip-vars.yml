@@ -1,5 +1,5 @@
 ---
 aptly_dont_snapshot_list: []
 aptly_dont_merge_snapshot_list:
-  - slushie-xenial-14.0.0-rabbitmq-upstream-testing-branch-mirror-ALL
-  - slushie-xenial-14.0.0-ubuntu-xenial
+  - rabbitmq-upstream-testing-branch-mirror-ALL
+  - xenial
