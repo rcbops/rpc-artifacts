@@ -8,6 +8,7 @@
   connection: local
   vars_files:
     - artifacting-vars.yml
+    - aptly-vars.yml
   tasks:
     - name: Fetch aptly role and rabbitmq vars files
       git:
