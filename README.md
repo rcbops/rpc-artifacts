@@ -2,20 +2,19 @@
 
 ## Requirements
 
-- Mirrors should be able to talk with ci nodes. Public keys of ci nodes in authorized keys of mirrors.
-- Aptly needs pgp keys. The requirements (generation of keys) are listed in aptly-snapshot-create.yml. These keys should be handled appropriately and shared amongst mirror/ci nodes
-- Aptly and rabbitmq roles need to be present on the aptly_cache node:
-
-    Git clone the aptly role in the proper folder, branch rax.
-
-    ``
-    cd /etc/ansible/roles/ && git clone https://github.com/evrardjp/ansible-role-aptly.git -b rax infOpen.aptly
-    ``
+- Mirrors should be able to talk with ci nodes.
+  Public keys of ci nodes in authorized keys of mirrors.
+- Aptly needs pgp keys.
+  The requirements (generation of keys) are listed in aptly-snapshot-create.yml.
+  These keys should be handled appropriately and shared amongst mirror/ci nodes.
 
 ## Playbooks info
 
 - ``mirror_install.yml`` ensures a static webserver exists on mirror servers
 - ``fetch_other_files.yml`` ensures the "other files" artifacts are stored on mirror servers
+
+### Aptly playbooks
+- ``aptly-pre-install.yml`` contains everything our aptly playbooks require.
 - ``aptly-install-and-mirror.yml`` is to be run frequently, to always have the db of packages up to date. This can be requiring a massive amount of storage. This could be run anywhere, but one cache should be used (for example by storing always on the same location, and attaching this storage appropriately). You can customize what to mirror by editing the artifacts-vars.yml. the do_update forces an update of the mirrors.
 - ``aptly-snapshot-create.yml`` is to run when tagging a release. This creates an immutable snapshot of the package list. That's the basis of the frozen release. Skip a snapshot by listing it to ``aptly_dont_snapshot_list`` in ``aptly-skip-vars.yml``
 - ``aptly-snapshot-merge-and-publish.yml`` is to run when tagging a release, after the snapshot create. This publishes to a local file, into a prefixed folder.

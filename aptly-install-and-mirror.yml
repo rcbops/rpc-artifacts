@@ -2,23 +2,23 @@
 #    gpg --gen-key
 #    mkdir -p /openstack/aptly
 #    gpg --export-secret-keys --armor CB6E9D87 > /openstack/aptly.private.key
-#    gpg --export --armor CB6E9D87 > /openstack/aptly.private.key
+#    gpg --export --armor CB6E9D87 > /openstack/aptly.public.key
 - name: Install aptly
   hosts: aptly_cache[0]
   vars_files:
     - artifacting-vars.yml
+  vars:
+    rabbitmq_package_url: "{{ _rabbitmq_package_url }}"
   roles:
     - infOpen.aptly
   post_tasks:
-    - git:
-        repo: "{{ rabbitmq_repo_url }}"
-        dest: "{{ rabbitmq_dest_folder }}"
-        version: "{{ rabbitmq_version }}"
-    - include_vars: "{{ rabbitmq_dest_folder }}/vars/debian.yml"
+    - include_vars: "{{ ansible_roles_folder }}/rabbitmq_server/vars/debian.yml"
       failed_when: false
     - name: Verify if rabbitmq is already there
-      command: su - aptly -c "apty package search 'Name (rabbitmq-server), Version ({{ _rabbitmq_package_version }})'"
+      command: su - aptly -c "aptly package search 'Name (rabbitmq-server), Version ({{ _rabbitmq_package_version }})'"
       register: rabbitmq_search
+      failed_when: false
+      changed_when: false
     - name: Fetch Rabbitmq to feed frozen repo
       get_url:
         # from: https://raw.githubusercontent.com/openstack/openstack-ansible-rabbitmq_server/stable/newton/vars/debian.yml
