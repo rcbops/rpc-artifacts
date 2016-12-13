@@ -9,10 +9,10 @@
     artifacts_extradownloads_clone_this_first:
       - repo: "https://github.com/openstack/openstack-ansible-os_swift.git"
         dest: "{{ ansible_roles_folder }}/os_swift"
-        version: "{{ roles_details | selectattr('name','equalto', 'os_swift') | list | map(attribute='version') | list }}"
+        version: "{{ roles_details | selectattr('name','equalto', 'os_swift') | list | map(attribute='version') | list | join('') }}"
       - repo: "https://github.com/openstack/openstack-ansible-os_tempest.git"
         dest: "{{ ansible_roles_folder }}/os_tempest"
-        version: "{{ roles_details | selectattr('name','equalto', 'os_tempest') | list | map(attribute='version') | list }}"
+        version: "{{ roles_details | selectattr('name','equalto', 'os_tempest') | list | map(attribute='version') | list | join('') }}"
   tasks:
     - name: Fetch roles to find what to download
       git:

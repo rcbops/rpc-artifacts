@@ -14,7 +14,7 @@
       git:
         repo: "{{ item.repo }}"
         dest: "{{ item.dest }}"
-        version: "{{ item.version | default('master') }}"
+        version: "{{ item.version | string | default('master') }}"
       with_items: "{{ aptly_clone_this_first }}"
       register: git_clone
       until: git_clone | success
