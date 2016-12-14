@@ -1,5 +1,3 @@
 ---
 aptly_dont_snapshot_list: []
-aptly_dont_merge_snapshot_list:
-  - rabbitmq-upstream-testing-branch-mirror-ALL
-  - xenial
+aptly_dont_merge_snapshot_list: []

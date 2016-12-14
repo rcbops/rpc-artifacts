@@ -15,22 +15,20 @@
           - artifacts_version is defined
           - distribution_release is defined
         msg: You need to define what you are releasing!
-    - shell: "aptly snapshot list -raw | grep slushie-{{ distribution_release }}-{{ artifacts_version }} {% if aptly_dont_merge_snapshot_list is defined and aptly_dont_merge_snapshot_list | length > 0 %}|grep -v -e {{ aptly_dont_merge_snapshot_list | join(' -e ') }} {% endif %}"
-      register: aptly_selected_snapshot_list
     - name: Merge the snapshots together
-      shell: "aptly snapshot merge slushie-{{ distribution_release }}-{{ artifacts_version }} {{ aptly_selected_snapshot_list.stdout_lines | join(' ') }}"
+      shell: "aptly snapshot merge miko-{{ artifacts_version }}-{{ distribution_release }} {{ aptly_miko_mapping.get(distribution_release) | join(' ') }}"
       when: (aptly_snapshot_merge | default(True)) | bool
       tags:
         - aptly_snapshot_merge
         - aptly_snapshot
     - name: Publish snapshot into public folder
-      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" slushie-{{ distribution_release }}-{{ artifacts_version }} {{ artifacts_version }}'
+      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" miko-{{ artifacts_version }}-{{ distribution_release }} {{ artifacts_version }}'
       when: (aptly_snapshot_merge | default(True)) | bool
       tags:
         - aptly_publish
     - name: Publish snapshot into public folder (no merge)
-      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" {{ item }} {{ artifacts_version }}/{{ item }}'
-      with_items: "{{ aptly_selected_snapshot_list.stdout_lines }}"
+      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" {{ item }} {{ item }}/{{ artifacts_version }}'
+      with_items: "{{ aptly_miko_mapping.get(distribution_release) }}"
       when: not (aptly_snapshot_merge | default(True)) | bool
       tags:
         - aptly_publish

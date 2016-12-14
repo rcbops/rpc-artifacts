@@ -17,6 +17,7 @@ aptly_clone_this_first:
     version: "rax"
 
 aptly_custom_gpg_key_file : /openstack/aptly.private.key
+aptly_custom_gpg_key_id: "{{ lookup('pipe','gpg /openstack/aptly.public.key | cut -f 2 -d \"/\" | cut -f 1 -d \" \" ') }}"
 aptly_system_archive_gpg_keys_import: True
 aptly_user_home: "/openstack/aptly"
 aptly_architectures:
@@ -25,6 +26,22 @@ aptly_architectures:
 #  - ppc64el
 aptly_dependency_follow_suggests: True
 aptly_mirror_do_updates: True
+# mapping for Miko (Merge) snapshots.
+# This is a list of the repo/mirror snapshots (slushies) that will appear in the miko* snapshots
+aptly_miko_mapping:
+  trusty:
+    # TODO(evrardjp): add ubuntu default packages
+    # TODO(evrardjp): add uca
+    - "slushie-{{ artifacts_version }}-mariadb-10.0-trusty"
+    - "slushie-{{ artifacts_version }}-percona-trusty"
+    - "slushie-{{ artifacts_version }}-haproxy-trusty"
+    - "slushie-{{ artifacts_version }}-rabbitmq-downloaded-packages-{{ artifacts_version }}-ALL"
+  xenial:
+    - "slushie-{{ artifacts_version }}-ubuntu-xenial"
+    - "slushie-{{ artifacts_version }}-uca-newton-updates-xenial"
+    - "slushie-{{ artifacts_version }}-mariadb-10.0-xenial"
+    - "slushie-{{ artifacts_version }}-percona-xenial"
+    - "slushie-{{ artifacts_version }}-rabbitmq-downloaded-packages-{{ artifacts_version }}-ALL"
 aptly_mirrors:
   - name: ubuntu-xenial
     archive_url: http://mirror.rackspace.com/ubuntu

@@ -1,0 +1,15 @@
+- include: aptly-pre-install.yml
+- include: aptly-install-and-mirror.yml
+- include: aptly-snapshot-create.yml
+  vars:
+    distribution_release: "trusty"
+- include: aptly-snapshot-create.yml
+  vars:
+    distribution_release: "xenial"
+- include: aptly-snapshot-merge-and-publish.yml
+  vars:
+    distribution_release: "trusty"
+- include: aptly-snapshot-merge-and-publish.yml
+  vars:
+    distribution_release: "xenial"
+- include: aptly-sync-to-mirror.yml
