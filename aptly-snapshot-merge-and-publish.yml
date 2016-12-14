@@ -17,12 +17,18 @@
         msg: You need to define what you are releasing!
     - name: Merge the snapshots together
       shell: "aptly snapshot merge miko-{{ artifacts_version }}-{{ distribution_release }} {{ aptly_miko_mapping.get(distribution_release) | join(' ') }}"
+      register: aptly_snapshot_merge_create
       when: (aptly_snapshot_merge | default(True)) | bool
+      failed_when: aptly_snapshot_merge_create.rc != 0 and aptly_snapshot_merge_create.stderr.find('already exists') == -1
+      changed_when: aptly_snapshot_merge_create.stderr.find('already exists') == -1
       tags:
         - aptly_snapshot_merge
         - aptly_snapshot
     - name: Publish snapshot into public folder
       shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" miko-{{ artifacts_version }}-{{ distribution_release }} {{ artifacts_version }}'
+      register: aptly_snapshot_publish
+      failed_when: aptly_snapshot_publish.rc != 0 and aptly_snapshot_publish.stderr.find('already used') == -1
+      changed_when: aptly_snapshot_publish.stderr.find('already used') == -1
       when: (aptly_snapshot_merge | default(True)) | bool
       tags:
         - aptly_publish

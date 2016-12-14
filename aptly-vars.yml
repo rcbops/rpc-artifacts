@@ -37,11 +37,13 @@ aptly_miko_mapping:
     - "slushie-{{ artifacts_version }}-haproxy-trusty"
     - "slushie-{{ artifacts_version }}-rabbitmq-downloaded-packages-{{ artifacts_version }}-ALL"
   xenial:
-    - "slushie-{{ artifacts_version }}-ubuntu-xenial"
-    - "slushie-{{ artifacts_version }}-uca-newton-updates-xenial"
-    - "slushie-{{ artifacts_version }}-mariadb-10.0-xenial"
+  #  - "slushie-{{ artifacts_version }}-ubuntu-xenial"
+  #  - "slushie-{{ artifacts_version }}-uca-newton-updates-xenial"
+  #  - "slushie-{{ artifacts_version }}-mariadb-10.0-xenial"
     - "slushie-{{ artifacts_version }}-percona-xenial"
     - "slushie-{{ artifacts_version }}-rabbitmq-downloaded-packages-{{ artifacts_version }}-ALL"
+#in the name of the mirror or of the repo, please
+#give either trusty/xenial (wherever appropriate) or ALL (for all distros)
 aptly_mirrors:
   - name: ubuntu-xenial
     archive_url: http://mirror.rackspace.com/ubuntu
@@ -58,7 +60,7 @@ aptly_mirrors:
       key: "C0B21F32 437D05B5"
       server: "hkp://keyserver.ubuntu.com:80"
       keyring: "trustedkeys.gpg"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
   - name: uca-newton-updates-xenial
     archive_url: http://ubuntu-cloud.archive.canonical.com/ubuntu
     distribution: xenial-updates/newton
@@ -73,7 +75,7 @@ aptly_mirrors:
       - "-keyring='trustedkeys.gpg'"
     update_flags:
       - "-keyring='trustedkeys.gpg'"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
   - name: mariadb-10.0-trusty
     archive_url: http://mirror.rackspace.com/mariadb/repo/10.0/ubuntu
     distribution: trusty
@@ -89,7 +91,7 @@ aptly_mirrors:
       - "-keyring='trustedkeys.gpg'"
     update_flags:
       - "-keyring='trustedkeys.gpg'"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
   - name: mariadb-10.0-xenial
     archive_url: http://mirror.rackspace.com/mariadb/repo/10.0/ubuntu
     distribution: xenial
@@ -105,7 +107,7 @@ aptly_mirrors:
       - "-keyring='trustedkeys.gpg'"
     update_flags:
       - "-keyring='trustedkeys.gpg'"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
   - name: percona-trusty
     archive_url: http://repo.percona.com/apt
     distribution: trusty
@@ -120,7 +122,7 @@ aptly_mirrors:
       - "-keyring='trustedkeys.gpg'"
     update_flags:
       - "-keyring='trustedkeys.gpg'"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
   - name: percona-xenial
     archive_url: http://repo.percona.com/apt
     distribution: xenial
@@ -135,7 +137,7 @@ aptly_mirrors:
       - "-keyring='trustedkeys.gpg'"
     update_flags:
       - "-keyring='trustedkeys.gpg'"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
   - name: haproxy-trusty
     archive_url: http://ppa.launchpad.net/vbernat/haproxy-1.5/ubuntu
     distribution: trusty
@@ -150,7 +152,7 @@ aptly_mirrors:
       - "-keyring='trustedkeys.gpg'"
     update_flags:
       - "-keyring='trustedkeys.gpg'"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
   # Rabbitmq:
   # Got the key from:
   # wget https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
@@ -169,7 +171,7 @@ aptly_mirrors:
       - "-keyring='trustedkeys.gpg'"
     update_flags:
       - "-keyring='trustedkeys.gpg'"
-    do_update: True
+    do_update: "{{ aptly_mirror_do_updates }}"
 # # POWERVM ONLY
 # - name: novalink-powervm
 #   archive_url: http://public.dhe.ibm.com/systems/virtualization/Novalink/debian
@@ -185,7 +187,7 @@ aptly_mirrors:
 #     - "-keyring='trustedkeys.gpg'"
 #   update_flags:
 #     - "-keyring='trustedkeys.gpg'"
-#   do_update: True
+#   do_update: "{{ aptly_mirror_do_updates }}"
 
 # For rabbitmq frozen
 aptly_repos:
