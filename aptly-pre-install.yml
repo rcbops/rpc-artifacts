@@ -1,6 +1,7 @@
 # Before going further, make sure you have keys.
 #    gpg --gen-key
 #    mkdir -p /openstack/aptly
+# Check the armor by gpg --list-keys
 #    gpg --export-secret-keys --armor CB6E9D87 > /openstack/aptly.private.key
 #    gpg --export --armor CB6E9D87 > /openstack/aptly.public.key
 - name: Prepare before aptly-install-and-mirror playbook

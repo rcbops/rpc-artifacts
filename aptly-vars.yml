@@ -1,12 +1,4 @@
 ---
-# Aptly vars
-# Before going further, make sure you have keys.
-#    gpg --gen-key
-#    mkdir -p /openstack/aptly
-#    gpg --export-secret-keys --armor 22A9BF80 > /openstack/aptly.private.key
-#    gpg --export --armor 22A9BF80 > /openstack/aptly.private.key
-#aptly_custom_gpg_key_id: 22A9BF80
-
 # Prepare for aptly, repos to clone.
 aptly_clone_this_first:
   - repo: "https://github.com/openstack/openstack-ansible-rabbitmq_server.git"

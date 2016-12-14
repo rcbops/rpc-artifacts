@@ -5,7 +5,7 @@
 - Mirrors should be able to talk with ci nodes.
   Public keys of ci nodes in authorized keys of mirrors.
 - Aptly needs pgp keys.
-  The requirements (generation of keys) are listed in aptly-snapshot-create.yml.
+  The requirements (generation of keys) are listed in ``aptly-pre-install.yml``
   These keys should be handled appropriately and shared amongst mirror/ci nodes.
 
 ## Playbooks info
