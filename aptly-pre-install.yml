@@ -11,6 +11,13 @@
     - artifacting-vars.yml
     - aptly-vars.yml
   tasks:
+    - name: Ensure folder exists
+      file:
+        state: directory
+        path: "{{ item }}"
+      with_items:
+        - "{{ artifacts_root_folder }}"
+        - "{{ ansible_roles_folder }}"
     - name: Fetch aptly role and rabbitmq vars files
       git:
         repo: "{{ item.repo }}"

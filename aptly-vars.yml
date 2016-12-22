@@ -11,13 +11,15 @@ aptly_clone_this_first:
 aptly_custom_gpg_key_file : /openstack/aptly.private.key
 aptly_custom_gpg_key_id: "{{ lookup('pipe','gpg /openstack/aptly.public.key | cut -f 2 -d \"/\" | cut -f 1 -d \" \" ') }}"
 aptly_system_archive_gpg_keys_import: True
-aptly_user_home: "/openstack/aptly"
+#aptly_user_home: "/openstack/aptly"
+aptly_user_home: "{{ artifacts_aptrepos_dest_folder }}"
+aptly_user: aptly
 aptly_architectures:
   - amd64
   - i386
 #  - ppc64el
 aptly_dependency_follow_suggests: True
-aptly_mirror_do_updates: True
+#aptly_mirror_do_updates: True
 # mapping for Miko (Merge) snapshots.
 # This is a list of the repo/mirror snapshots (slushies) that will appear in the miko* snapshots
 aptly_miko_mapping:

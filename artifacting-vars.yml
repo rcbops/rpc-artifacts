@@ -1,8 +1,8 @@
 ---
 # Artifacts folders
 artifacts_root_folder: "/openstack/artifcats"
-artifacts_aptrepos_dest_folder: "{{ artifacts_root_folder }}/apt/"
-artifact_extradownloads_dest_folder: "{{ artifacts_root_folder }}/downloads/"
+artifacts_aptrepos_dest_folder: "{{ artifacts_root_folder }}/apt"
+artifact_extradownloads_dest_folder: "{{ artifacts_root_folder }}/downloads"
 ansible_roles_folder: "/etc/ansible/roles"
 
 # Generic details
