@@ -2,3 +2,5 @@
 
 [aptly_cache]
 localhost ansible_connection=local
+
+[mirrors]
