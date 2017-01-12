@@ -4,6 +4,13 @@
     - artifacting-vars.yml
     - aptly-vars.yml
   tasks:
+    - name: Ensure the folders are present on the repo before we try to sync them
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ aptly_user_home }}"
+        - "{{ artifacts_root_folder }}"
     - name: Synchronize cache
       synchronize:
         src: "{{ item.src }}"
@@ -30,21 +37,42 @@
           mode: "push"
           src: "{{ aptly_user_home }}"
           dest: "{{ artifacts_aptrepos_dest_folder | dirname }}"
+
+- name: Permissions handling
+  hosts: localhost
+  connection: local
+  vars_files:
+    - artifacting-vars.yml
+    - aptly-vars.yml
+  tasks:
     - name: Make sure pulled data has the proper permissions
       file:
         path: "{{ item.path }}"
         state: "{{ item.state }}"
         recurse: "{{ item.recurse | default(omit) }}"
         owner: "{{ item.owner | default(omit) }}"
-      when: item.action == action
+      when: action=="pull-all"
       with_items:
         - path: "{{ aptly_user_home }}"
           state: "directory"
           recurse: "yes"
           owner: "{{ aptly_user }}"
-          action: "pull-all"
+
+- name: Permissions handling
+  hosts: mirrors
+  vars_files:
+    - artifacting-vars.yml
+    - aptly-vars.yml
+  tasks:
+    - name: Make sure pulled data has the proper permissions
+      file:
+        path: "{{ item.path }}"
+        state: "{{ item.state }}"
+        recurse: "{{ item.recurse | default(omit) }}"
+        owner: "{{ item.owner | default(omit) }}"
+      when: action=="push-aptly"
+      with_items:
         - path: "{{ aptly_user_home }}"
           state: "directory"
           recurse: "yes"
           owner: "root"
-          action: "push-aptly"
