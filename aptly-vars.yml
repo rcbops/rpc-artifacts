@@ -8,8 +8,8 @@ aptly_clone_this_first:
     dest: "{{ ansible_roles_folder }}/infOpen.aptly"
     version: "rax"
 
-aptly_custom_gpg_key_file : "{{ aptly_user_home }}/aptly.private.key"
-aptly_custom_gpg_key_id: "{{ lookup('pipe','gpg ' + aptly_user_home + '/aptly.public.key | cut -f 2 -d \"/\" | cut -f 1 -d \" \" ') }}"
+aptly_custom_gpg_key_file : "{{ artifacts_root_folder }}/aptly.private.key"
+aptly_custom_gpg_key_id: "{{ lookup('pipe','gpg ' + artifacts_root_folder + '/aptly.public.key | cut -f 2 -d \"/\" | cut -f 1 -d \" \" ') }}"
 aptly_system_archive_gpg_keys_import: True
 aptly_user_home: "{{ artifacts_aptrepos_dest_folder }}"
 aptly_user: aptly
