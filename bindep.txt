@@ -6,5 +6,4 @@ python2.7
 python-dev
 python-pyasn1
 python-openssl
-python-ndg-httpsclient
 gzip
