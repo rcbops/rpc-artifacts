@@ -43,6 +43,15 @@ aptly_miko_mapping:
     - "slushie-{{ artifacts_version }}-elastic-kibana-4.5-ALL"
     - "slushie-{{ artifacts_version }}-elastic-beats-ALL"
     - "slushie-{{ artifacts_version }}-elastic-es-1.7-ALL"
+# mapping for N (NOT MERGE) snapshots
+# This is a list of the repo/mirror snapshots (slushies) that will be published separately.
+aptly_n_mapping:
+  trusty:
+    - src: "slushie-{{ artifacts_version }}-hwraid-trusty"
+      dest: "hwraid"
+  xenial:
+    - src: "slushie-{{ artifacts_version }}-hwraid-xenial"
+      dest: "hwraid"
 
 #in the name of the mirror or of the repo, please
 #give either trusty/xenial (wherever appropriate) or ALL (for all distros)
@@ -265,13 +274,37 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+  - name: hwraid-trusty
+    archive_url: http://hwraid.le-vert.net/ubuntu/
+    distribution: trusty
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "23B3D3B4"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: "{{ aptly_mirror_do_updates }}"
+  - name: hwraid-xenial
+    archive_url: http://hwraid.le-vert.net/ubuntu/
+    distribution: wily
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "23B3D3B4"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: "{{ aptly_mirror_do_updates }}"
 ## TODO
-## TODO
-#hwraid_apt_repo_url: "http://mirror.rackspace.com/hwraid.le-vert.net/ubuntu/"
-#hwraid_apt_repos:
-#  - { repo: "deb {{ hwraid_apt_repo_url }} {{ ansible_lsb.codename }} main", state: "present" }
-#hwraid_apt_keys:
-#  - { url: "http://mirror.rackspace.com/hwraid.le-vert.net/ubuntu/hwraid.le-vert.net.gpg.key", state: "present" }
 #raxmon_repo_url: "http://stable.packages.cloudmonitoring.rackspace.com/ubuntu-14.04-x86_64"
 #maas_apt_keys:
 #  - { url: "https://monitoring.api.rackspacecloud.com/pki/agent/linux.asc", state: "present" }
