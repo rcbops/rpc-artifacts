@@ -3,7 +3,7 @@
     aptly_mirror_do_updates: "False"
 - include: sync-with-mirror.yml
   vars:
-    action: "pull-all"
+    action: "pull-aptly"
 - include: aptly-install-and-mirror.yml
   vars:
     aptly_mirror_do_updates: "True"

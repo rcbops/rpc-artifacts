@@ -27,10 +27,10 @@
       failed_when: false
       when: item.action == action
       with_items:
-        - action: "pull-all"
+        - action: "pull-aptly"
           mode: "pull"
-          src: "{{ artifacts_root_folder }}"
-          dest: "{{ artifacts_root_folder | dirname }}"
+          src: "{{ aptly_user_home }}"
+          dest: "{{ artifacts_aptrepos_dest_folder | dirname }}"
           delete: "yes"
           recursive: "yes"
         - action: "push-aptly"
@@ -51,7 +51,7 @@
         state: "{{ item.state }}"
         recurse: "{{ item.recurse | default(omit) }}"
         owner: "{{ item.owner | default(omit) }}"
-      when: action=="pull-all"
+      when: action=="pull-aptly"
       with_items:
         - path: "{{ aptly_user_home }}"
           state: "directory"
@@ -64,7 +64,7 @@
     - artifacting-vars.yml
     - aptly-vars.yml
   tasks:
-    - name: Make sure pulled data has the proper permissions
+    - name: Make sure pushed data has the proper permissions
       file:
         path: "{{ item.path }}"
         state: "{{ item.state }}"
