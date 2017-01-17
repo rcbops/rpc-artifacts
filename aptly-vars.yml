@@ -48,10 +48,10 @@ aptly_miko_mapping:
 aptly_n_mapping:
   trusty:
     - src: "slushie-{{ artifacts_version }}-hwraid-trusty"
-      dest: "hwraid"
+      dest: "hwraid-trusty"
   xenial:
     - src: "slushie-{{ artifacts_version }}-hwraid-xenial"
-      dest: "hwraid"
+      dest: "hwraid-xenial"
 
 #in the name of the mirror or of the repo, please
 #give either trusty/xenial (wherever appropriate) or ALL (for all distros)
