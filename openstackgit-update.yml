@@ -23,9 +23,11 @@
 # is expected to contain more repositories than RPC will need, but
 # will always have a complete set.
 
-- name: Update the openstackgit clones
+- name: Fetch the latest openstackgit clones
   hosts: localhost
   connection: local
+  vars:
+    working_dir: "{{ lookup('ENV', 'PWD') }}"
   tasks:
 
     - name: Ensure that the openstackgit folder exists
@@ -33,22 +35,13 @@
         path: "{{ working_dir }}/openstackgit"
         state: directory
 
-    - name: Clone the openstack-ansible repository
-      git:
-        repo: "https://git.openstack.org/openstack/openstack-ansible"
-        dest: "{{ working_dir }}/"
-      register: git_clone
-      until: git_clone | success
-      retries: 2
-      delay: 5
-
     - name: Lookup all the git repositories we need to update
       debug:
         msg: "Looking up repositories"
-      with_py_pkgs: "{{ working_dir }}/openstack-ansible"
+      with_py_pkgs: "{{ working_dir }}/"
       register: local_packages
 
-    - name: Create/update the openstackgit clones
+    - name: Fetch the openstackgit clones
       git:
         repo: "{{ item.url }}"
         dest: "{{ working_dir }}/openstackgit/"
@@ -58,8 +51,25 @@
       with_items: "{{ local_packages.results.0.item.remote_package_parts }}"
       register: git_clone
       until: git_clone | success
-      retries: 2
+      retries: 5
       delay: 5
 
+
+
+- name: Push the updated clones to rpc-repo
+  hosts: mirrors
   vars:
     working_dir: "{{ lookup('ENV', 'PWD') }}"
+  tasks:
+
+    - name: Synchronize cache
+      synchronize:
+        src: "{{ working_dir }}/openstackgit"
+        dest: "/var/www/repo/"
+        mode: push
+        delete: yes
+        recursive: yes
+      register: synchronize
+      until: synchronize | success
+      retries: 5
+      delay: 5
