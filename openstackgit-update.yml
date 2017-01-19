@@ -43,8 +43,8 @@
 
     - name: Fetch the openstackgit clones
       git:
-        repo: "{{ item.url }}"
-        dest: "{{ working_dir }}/openstackgit/"
+        repo: "{{ item['url'] }}"
+        dest: "{{ working_dir }}/openstackgit/{{ item['name'] }}"
         version: "master"
         update: true
         force: true
