@@ -62,7 +62,7 @@
     working_dir: "{{ lookup('ENV', 'PWD') }}"
   tasks:
 
-    - name: Synchronize cache
+    - name: Push updated git clones to rpc-repo
       synchronize:
         src: "{{ working_dir }}/openstackgit"
         dest: "/var/www/repo/"
@@ -73,3 +73,11 @@
       until: synchronize | success
       retries: 5
       delay: 5
+
+    - name: Ensure that the rpc-repo files have the correct owner/group
+      file:
+        path: "/var/www/repo/openstackgit"
+        state: "directory"
+        owner: "nginx"
+        group: "www-data"
+        recurse: yes
