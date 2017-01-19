@@ -23,17 +23,32 @@
 # is expected to contain more repositories than RPC will need, but
 # will always have a complete set.
 
-- name: Fetch the latest openstackgit clones
+- name: Pull the current openstackgit folder from rpc-repo
+  hosts: mirrors
+  vars:
+    working_dir: "{{ lookup('ENV', 'PWD') }}"
+  tasks:
+
+    - name: Pull the data from rpc-repo
+      synchronize:
+        src: "/var/www/repo/openstackgit"
+        dest: "{{ working_dir }}/"
+        mode: pull
+        delete: yes
+        recursive: yes
+      register: synchronize
+      until: synchronize | success
+      retries: 5
+      delay: 5
+
+
+
+- name: Update the openstackgit data
   hosts: localhost
   connection: local
   vars:
     working_dir: "{{ lookup('ENV', 'PWD') }}"
   tasks:
-
-    - name: Ensure that the openstackgit folder exists
-      file:
-        path: "{{ working_dir }}/openstackgit"
-        state: directory
 
     - name: Lookup all the git repositories we need to update
       debug:
@@ -41,7 +56,7 @@
       with_py_pkgs: "{{ working_dir }}/"
       register: local_packages
 
-    - name: Fetch the openstackgit clones
+    - name: Update the openstackgit clones
       git:
         repo: "{{ item['url'] }}"
         dest: "{{ working_dir }}/openstackgit/{{ item['name'] }}"
@@ -69,15 +84,9 @@
         mode: push
         delete: yes
         recursive: yes
+        rsync_opts:
+          - "--chown=nginx:www-data"
       register: synchronize
       until: synchronize | success
       retries: 5
       delay: 5
-
-    - name: Ensure that the rpc-repo files have the correct owner/group
-      file:
-        path: "/var/www/repo/openstackgit"
-        state: "directory"
-        owner: "nginx"
-        group: "www-data"
-        recurse: yes
