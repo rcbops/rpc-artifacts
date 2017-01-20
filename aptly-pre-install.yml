@@ -23,6 +23,7 @@
         repo: "{{ item.repo }}"
         dest: "{{ item.dest }}"
         version: "{{ item.version | string | default('master') }}"
+        force: yes
       with_items: "{{ aptly_clone_this_first }}"
       register: git_clone
       until: git_clone | success
