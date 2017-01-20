@@ -75,4 +75,4 @@
         - path: "{{ aptly_user_home }}"
           state: "directory"
           recurse: "yes"
-          owner: "root"
+          owner: "{{ webservice_owner }}"

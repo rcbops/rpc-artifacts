@@ -10,3 +10,6 @@ rpc_branch: "master"
 osa_branch: 'stable/newton' #can be automated later by lookup
 roles_details: "{{ lookup('url','https://raw.githubusercontent.com/openstack/openstack-ansible/'+osa_branch+'/ansible-role-requirements.yml',wantlist=True) | join('\n') | from_yaml  }}"
 artifacts_version: "rpc-14.0.0rc1" #Move to reading variable from here: "https://github.com/rcbops/rpc-openstack/blob/master/rpcd/playbooks/group_vars/all.yml"
+
+# rpc-repo mirror details
+webservice_owner: "nginx"
