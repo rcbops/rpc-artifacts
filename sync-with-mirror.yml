@@ -1,4 +1,4 @@
-- name: Sync with mirror
+- name: Sync apt artifacts with mirror
   hosts: mirrors
   vars_files:
     - artifacting-vars.yml
@@ -38,7 +38,7 @@
           src: "{{ aptly_user_home }}"
           dest: "{{ artifacts_aptrepos_dest_folder | dirname }}"
 
-- name: Permissions handling
+- name: Ensure localhost has the permissions to manipulate aptly cache
   hosts: localhost
   connection: local
   vars_files:
@@ -58,7 +58,7 @@
           recurse: "yes"
           owner: "{{ aptly_user }}"
 
-- name: Permissions handling
+- name: Ensure mirror has the permissions to serve aptly public folders
   hosts: mirrors
   vars_files:
     - artifacting-vars.yml
@@ -76,3 +76,16 @@
           state: "directory"
           recurse: "yes"
           owner: "{{ webservice_owner }}"
+
+- name: Public serve the gpg used for signing
+  hosts: mirrors
+  vars_files:
+    - artifacting-vars.yml
+    - aptly-vars.yml
+  tasks:
+    - name: Sync apt public key with mirror
+      copy:
+        src: "{{ aptly_custom_gpg_pubkey_file }}"
+        dest: "{{ aptly_custom_gpg_pubkey_file }}"
+        owner: "{{ webservice_owner }}"
+      when: action=="push-gpg"
