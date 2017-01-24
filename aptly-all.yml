@@ -22,3 +22,6 @@
 - include: sync-with-mirror.yml
   vars:
     action: "push-aptly"
+- include: sync-with-mirror.yml
+  vars:
+    action: "push-gpg"
