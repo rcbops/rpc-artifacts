@@ -34,7 +34,6 @@ aptly_miko_mapping:
     - "slushie-{{ artifacts_version }}-elastic-kibana-4.5-ALL"
     - "slushie-{{ artifacts_version }}-elastic-beats-ALL"
     - "slushie-{{ artifacts_version }}-elastic-es-1.7-ALL"
-    - "slushie-{{ artifacts_version }}-hwraid-trusty"
   xenial:
 #    - "slushie-{{ artifacts_version }}-ubuntu-xenial"
     - "slushie-{{ artifacts_version }}-uca-newton-updates-xenial"
@@ -45,7 +44,6 @@ aptly_miko_mapping:
     - "slushie-{{ artifacts_version }}-elastic-kibana-4.5-ALL"
     - "slushie-{{ artifacts_version }}-elastic-beats-ALL"
     - "slushie-{{ artifacts_version }}-elastic-es-1.7-ALL"
-    - "slushie-{{ artifacts_version }}-hwraid-xenial"
 # mapping for N (NOT MERGE) snapshots
 # This is a list of the repo/mirror snapshots (slushies) that will be published separately.
 aptly_n_mapping:
