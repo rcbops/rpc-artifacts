@@ -25,14 +25,14 @@
         - aptly_snapshot_merge
         - aptly_snapshot
     - name: Publish snapshot into public/integrated/ folder
-      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" -component="{{ artifacts_version }}" miko-{{ artifacts_version }}-{{ distribution_release }} integrated'
+      shell: 'aptly publish snapshot -distribution="{{ artifacts_version }}-{{ distribution_release }}" miko-{{ artifacts_version }}-{{ distribution_release }} integrated'
       register: aptly_snapshot_publish
       failed_when: aptly_snapshot_publish.rc != 0 and aptly_snapshot_publish.stderr.find('already used') == -1
       changed_when: aptly_snapshot_publish.stderr.find('already used') == -1
       tags:
         - aptly_publish
     - name: Publish snapshot into public folder (no merge)
-      shell: 'aptly publish snapshot -distribution="{{ distribution_release }}" -component="{{ artifacts_version }}" {{ item.src }} independant/{{ item.dest }}'
+      shell: 'aptly publish snapshot -distribution="{{ artifacts_version }}-{{ distribution_release }}" {{ item.src }} independant/{{ item.dest }}'
       with_items: "{{ aptly_n_mapping.get(distribution_release) }}"
       register: aptly_snapshot_nomerge_publish
       failed_when: aptly_snapshot_nomerge_publish.rc != 0 and aptly_snapshot_nomerge_publish.stderr.find('already used') == -1

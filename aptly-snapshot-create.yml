@@ -39,6 +39,7 @@
       when:
         - "{{ lookup('ENV','RECREATE_SNAPSHOTS') | default('NO') == 'YES' }}"
         - "item.find('{{ artifacts_version }}') != -1"
+        - "item.find('{{ distribution_release }}') != -1"
       failed_when: false
     - name: Delete old merged snapshots for this distro/artifacts version
       shell: "aptly snapshot drop {{ item }}"
