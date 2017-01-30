@@ -351,5 +351,5 @@ aptly_repos:
     create_flags:
       - '-comment="RabbitMQ Downloaded packages from RabbitMQ repo"'
     state: 'present'
-# NON APTLY ROLE
-aptly_snapshot_merge: True
+# Ensure aptly keeps all packages of all versions
+aptly_snapshot_merge_flags: "-no-remove=true"

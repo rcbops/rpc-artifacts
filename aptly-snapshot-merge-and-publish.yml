@@ -16,9 +16,8 @@
           - distribution_release is defined
         msg: You need to define what you are releasing!
     - name: Merge the snapshots together
-      shell: "aptly snapshot merge miko-{{ artifacts_version }}-{{ distribution_release }} {{ aptly_miko_mapping.get(distribution_release) | join(' ') }}"
+      shell: "aptly snapshot merge {{ aptly_snapshot_merge_flags }} miko-{{ artifacts_version }}-{{ distribution_release }} {{ aptly_miko_mapping.get(distribution_release) | join(' ') }}"
       register: aptly_snapshot_merge_create
-      when: (aptly_snapshot_merge | default(True)) | bool
       failed_when: aptly_snapshot_merge_create.rc != 0 and aptly_snapshot_merge_create.stderr.find('already exists') == -1
       changed_when: aptly_snapshot_merge_create.stderr.find('already exists') == -1
       tags:
