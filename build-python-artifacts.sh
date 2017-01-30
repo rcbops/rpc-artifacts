@@ -33,5 +33,5 @@ echo "repo_build_wheel_selective: no" >> /etc/openstack_deploy/user_osa_variable
 echo "repo_build_venv_selective: no" >> /etc/openstack_deploy/user_osa_variables_overrides.yml
 
 cd /opt/rpc-openstack/openstack-ansible/playbooks
-openstack-ansible setup-hosts.yml --limit repo_all
+openstack-ansible setup-hosts.yml -e container_group=repo_all
 openstack-ansible repo-install.yml
