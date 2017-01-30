@@ -34,6 +34,7 @@ aptly_miko_mapping:
     - "slushie-{{ artifacts_version }}-elastic-kibana-4.5-ALL"
     - "slushie-{{ artifacts_version }}-elastic-beats-ALL"
     - "slushie-{{ artifacts_version }}-elastic-es-1.7-ALL"
+    - "slushie-{{ artifacts_version }}-elastic-es-2.x-ALL"
   xenial:
 #    - "slushie-{{ artifacts_version }}-ubuntu-xenial"
     - "slushie-{{ artifacts_version }}-uca-newton-updates-xenial"
@@ -44,6 +45,7 @@ aptly_miko_mapping:
     - "slushie-{{ artifacts_version }}-elastic-kibana-4.5-ALL"
     - "slushie-{{ artifacts_version }}-elastic-beats-ALL"
     - "slushie-{{ artifacts_version }}-elastic-es-1.7-ALL"
+    - "slushie-{{ artifacts_version }}-elastic-es-2.x-ALL"
 # mapping for N (NOT MERGE) snapshots
 # This is a list of the repo/mirror snapshots (slushies) that will be published separately.
 aptly_n_mapping:
@@ -262,6 +264,21 @@ aptly_mirrors:
     do_update: "{{ aptly_mirror_do_updates }}"
   - name: elastic-es-1.7-ALL
     archive_url: http://packages.elastic.co/elasticsearch/1.7/debian
+    distribution: stable
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "D88E42B4"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: "{{ aptly_mirror_do_updates }}"
+  - name: elastic-es-2.x-ALL
+    archive_url: http://packages.elastic.co/elasticsearch/2.x/debian
     distribution: stable
     component1:
       - main
