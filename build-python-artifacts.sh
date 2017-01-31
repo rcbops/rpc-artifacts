@@ -38,12 +38,9 @@ cd /opt/rpc-openstack/openstack-ansible/playbooks
 openstack-ansible setup-hosts.yml -e container_group=repo_all
 openstack-ansible repo-install.yml
 
-if [ -z "${REPO_KEY}" ]; then
-  echo "Skipping upload to rpc-repo as the REPO_KEY env var is not set."
-elif [ -z "${REPO_HOST}" ]; then
-  echo "Skipping upload to rpc-repo as the REPO_HOST env var is not set."
-elif [ -z "${REPO_USER}" ]; then
-  echo "Skipping upload to rpc-repo as the REPO_USER env var is not set."
+if [ -z ${REPO_KEY+x} ] || [ -z ${REPO_HOST+x} ] || [ -z ${REPO_USER+x} ]; then
+  echo "Skipping upload to rpc-repo as the REPO_* env vars are not set."
+  exit 1
 else
   # Prep the ssh key for uploading to rpc-repo
   mkdir -p ~/.ssh/
