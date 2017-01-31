@@ -52,10 +52,10 @@ else
          -e 's/\s*-----END RSA PRIVATE KEY-----\s*//' \
          -e 's/ /\n/g' >> $key
   echo "-----END RSA PRIVATE KEY-----" >> $key
-  chmod 600 ${{key}}
+  chmod 600 ${key}
   set -x
   #Append host to [mirrors] group
-  echo "repo ansible_host=${REPO_HOST} ansible_user=${REPO_USER} ansible_ssh_private_key_file='~/.ssh/repo.key' " >> /opt/rpc-artifacts/inventory
+  echo "repo ansible_host=${REPO_HOST} ansible_user=${REPO_USER} ansible_ssh_private_key_file='${key}' " >> /opt/rpc-artifacts/inventory
 
   # As we don't have access to the public key in this job
   # we need to disable host key checking.
