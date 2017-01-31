@@ -38,18 +38,27 @@ cd /opt/rpc-openstack/openstack-ansible/playbooks
 openstack-ansible setup-hosts.yml -e container_group=repo_all
 openstack-ansible repo-install.yml
 
-if [ -z ${REPO_USER_KEY+x} ] || [ -z ${REPO_HOST+x} ] || [ -z ${REPO_HOST_PUBKEY+x} ] || [ -z ${REPO_USER+x} ]; then
+if [ -z ${REPO_KEY+x} ] || [ -z ${REPO_HOST+x} ] ||  [ -z ${REPO_USER+x} ]; then
   echo "Skipping upload to rpc-repo as the required env vars are not set."
 else
   # Prep the ssh key for uploading to rpc-repo
   mkdir -p ~/.ssh/
   set +x
-  cat $REPO_USER_KEY > ~/.ssh/repo.key
-  chmod 600 ~/.ssh/repo.key
-  grep "${REPO_HOST}" ~/.ssh/known_hosts || echo "${REPO_HOST} $(cat $REPO_HOST_PUBKEY)" >> ~/.ssh/known_hosts
+  key=~/.ssh/repo.key
+  echo "-----BEGIN RSA PRIVATE KEY-----" > $key
+  echo "$REPO_KEY" \
+    |sed -e 's/\s*-----BEGIN RSA PRIVATE KEY-----\s*//' \
+         -e 's/\s*-----END RSA PRIVATE KEY-----\s*//' \
+         -e 's/ /\n/g' >> $key
+  echo "-----END RSA PRIVATE KEY-----" >> $key
+  chmod 600 ${{key}}
   set -x
   #Append host to [mirrors] group
   echo "repo ansible_host=${REPO_HOST} ansible_user=${REPO_USER} ansible_ssh_private_key_file='~/.ssh/repo.key' " >> /opt/rpc-artifacts/inventory
+
+  # As we don't have access to the public key in this job
+  # we need to disable host key checking.
+  export ANSIBLE_HOST_KEY_CHECKING=False
 
   # Upload the artifacts to rpc-repo
   cd /opt/rpc-artifacts
