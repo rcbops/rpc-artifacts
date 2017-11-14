@@ -38,18 +38,28 @@ export BASE_DIR=${PWD}
 # This ensures that there is no race condition with the artifacts-git job
 export ANSIBLE_ROLE_FETCH_MODE="git-clone"
 
-## Main ----------------------------------------------------------------------
+export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
-# Bootstrap Ansible
-# This script is sourced to ensure that the common
-# functions and vars are available.
-source scripts/bootstrap-ansible.sh
+## Main ----------------------------------------------------------------------
+# Run basic setup
+source ${SCRIPT_PATH}/../setup/artifact-setup.sh
+
+# Basic host/mirror inventory
+envsubst < ${SCRIPT_PATH}/../inventory > /opt/inventory
+
+# Set the galera client version number
+GALERA_CLIENT_VERSION=$(${SCRIPT_PATH}/../derive-artifact-version.py /etc/ansible/roles/galera_client/defaults/main.yml galera_client_major_version || echo "10.1")
+if ! grep -q '^galera_client_major_version' /etc/openstack_deploy/user_variables.yml; then
+  echo "galera_client_major_version: ${GALERA_CLIENT_VERSION}" | tee -a /etc/openstack_deploy/user_variables.yml
+else
+  sed -i "s|^galera_client_major_version.*|galera_client_major_version: ${GALERA_CLIENT_VERSION}|" /etc/openstack_deploy/user_variables.yml
+fi
 
 # Fetch all the git repositories and generate the git artifacts
 # The openstack-ansible CLI is used to ensure that the library path is set
 #
 openstack-ansible -i /opt/inventory \
-                  ${BASE_DIR}/scripts/artifacts-building/git/openstackgit-update.yml \
+                  ${SCRIPT_PATH}/openstackgit-update.yml \
                   -e rpc_release=${RPC_RELEASE} \
                   ${ANSIBLE_PARAMETERS}
 
@@ -98,13 +108,9 @@ if [[ "$(echo ${PUSH_TO_MIRROR} | tr [a-z] [A-Z])" == "YES" ]]; then
         # Ensure that the repo server public key is a known host
         grep "${REPO_HOST}" ~/.ssh/known_hosts || echo "${REPO_HOST} $(cat $REPO_HOST_PUBKEY)" >> ~/.ssh/known_hosts
 
-        # Create the Ansible inventory for the upload
-        echo '[mirrors]' > /opt/inventory
-        echo "repo ansible_host=${REPO_HOST} ansible_user=${REPO_USER} ansible_ssh_private_key_file='${REPO_KEYFILE}' " >> /opt/inventory
-
         # Upload the artifacts to rpc-repo
         openstack-ansible -i /opt/inventory \
-                          ${BASE_DIR}/scripts/artifacts-building/git/openstackgit-push-to-mirror.yml \
+                          ${SCRIPT_PATH}/openstackgit-push-to-mirror.yml \
                           -e rpc_release=${RPC_RELEASE} \
                           ${ANSIBLE_PARAMETERS}
     fi

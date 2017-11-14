@@ -27,7 +27,6 @@
     working_dir: "{{ lookup('ENV', 'PWD') }}"
     git_archive_dir: "{{ working_dir }}/git-archives/{{ rpc_release }}"
   tasks:
-
     - name: Lookup all the git repositories we need to update
       debug:
         msg: "Looking up repositories"
@@ -37,13 +36,21 @@
         - "/etc/ansible/roles"
       register: local_packages
 
+    - name: Set package parts list
+      set_fact:
+        remote_package_parts: "{{ local_packages.results.0.item.remote_package_parts }}"
+
+    - name: Determine list of git repositories
+      set_fact:
+        existing_repos: "{{ (remote_package_parts | map(attribute='name')) | list }}"
+
     - name: Update the openstackgit clones
       git:
         repo: "{{ item['url'] }}"
         dest: "{{ working_dir }}/openstackgit/{{ item['name'] }}"
         version: "{{ item['version'] }}"
         force: yes
-      with_items: "{{ local_packages.results.0.item.remote_package_parts }}"
+      with_items: "{{ remote_package_parts }}"
       register: git_clone
       until: git_clone | success
       retries: 5
@@ -53,10 +60,6 @@
       file:
         path: "{{ git_archive_dir }}"
         state: directory
-
-    - name: Determine list of git repositories
-      set_fact:
-        existing_repos: "{{ (local_packages.results.0.item.remote_package_parts | map(attribute='name')) | list }}"
 
     - name: Get list of existing archives
       shell: |

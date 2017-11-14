@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/opt/ansible-runtime/bin/python
 #
 # Copyright 2017, Rackspace US, Inc.
 #
@@ -17,4 +17,33 @@
 # (c) 2017, Jean-Philippe Evrard <jean-philippe.evrard@rackspace.co.uk>
 
 # Be the single source of truth for finding the artifact version with the static file modification.
-awk '/rpc_release/ { print $2; }' /opt/rpc-openstack/group_vars/all/release.yml | sed s'/"//'g
+import sys
+
+import yaml
+
+
+# Default lookups when no extra items are passed in.
+FILE_NAME = '/opt/rpc-openstack/etc/openstack_deploy/group_vars/all/release.yml'
+LOOKUP_KEY = 'rpc_release'
+
+
+def main():
+    """Lookup a specific key in a YAML file and return its value."""
+    if len(sys.argv) == 3:
+        file_name = sys.argv[1]
+        lookup_key = sys.argv[2]
+    else:
+        file_name = FILE_NAME
+        lookup_key = LOOKUP_KEY
+
+    with open(file_name) as f:
+        data = yaml.safe_load(f.read())
+
+    try:
+        return data[lookup_key]
+    except KeyError:
+        raise SystemExit('failed')
+
+
+if __name__ == '__main__':
+    print(main())

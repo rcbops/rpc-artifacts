@@ -38,32 +38,42 @@ export BASE_DIR=${PWD}
 # This ensures that there is no race condition with the artifacts-git job
 export ANSIBLE_ROLE_FETCH_MODE="git-clone"
 
+export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
+
 ## Main ----------------------------------------------------------------------
 
 # Ensure no remnants (not necessary if ephemeral host, but useful for dev purposes
 rm -f /opt/list
 
-# The derive-artifact-version.sh script expects the git clone to
-# be at /opt/rpc-openstack, so we link the current folder there.
-if [[ "${PWD}" != "/opt/rpc-openstack" ]]; then
-  ln -sfn ${PWD} /opt/rpc-openstack
+# Run basic setup
+source ${SCRIPT_PATH}/../setup/artifact-setup.sh
+
+# Set the galera client version number
+GALERA_CLIENT_VERSION=$(${SCRIPT_PATH}/../derive-artifact-version.py /etc/ansible/roles/galera_client/defaults/main.yml galera_client_major_version || echo "10.1")
+if ! grep -q '^galera_client_major_version' /etc/openstack_deploy/user_artifact_variables.yml; then
+  echo "galera_client_major_version: ${GALERA_CLIENT_VERSION}" | tee -a /etc/openstack_deploy/user_artifact_variables.yml
+else
+  sed -i "s|^galera_client_major_version.*|galera_client_major_version: ${GALERA_CLIENT_VERSION}|" /etc/openstack_deploy/user_artifact_variables.yml
 fi
 
 # Bootstrap Ansible
 # This script is sourced to ensure that the common
 # functions and vars are available.
-cd /opt/rpc-openstack
-source scripts/bootstrap-ansible.sh
+cd /opt/openstack-ansible
 
 # Bootstrap the AIO configuration
-./scripts/bootstrap-aio.sh
-
-# Copy the current user-space defaults file
-cp "/opt/rpc-openstack/rpcd/etc/openstack_deploy/user_osa_variables_defaults.yml" /etc/openstack_deploy/
+bash -c "/opt/openstack-ansible/scripts/bootstrap-aio.sh"
 
 # Remove all host group allocations to ensure
 # that no containers are created in the inventory.
-rm -f /etc/openstack_deploy/conf.d/*
+find /etc/openstack_deploy/conf.d/ -type f -exec rm -f {} \;
+
+# Ensure the correct dir structure exists
+mkdir -p /etc/openstack_deploy/conf.d
+
+# Ensure the files and directories have mutable permissions
+find /etc/openstack_deploy/ -type d -exec chmod 0755 {} \;
+find /etc/openstack_deploy/ -type f -exec chmod 0644 {} \;
 
 # Figure out when it is safe to automatically replace artifacts
 if [[ "$(echo ${PUSH_TO_MIRROR} | tr [a-z] [A-Z])" == "YES" ]]; then
@@ -89,14 +99,8 @@ if [[ "$(echo ${REPLACE_ARTIFACTS} | tr [a-z] [A-Z])" == "YES" ]]; then
   export PUSH_TO_MIRROR="YES"
 fi
 
-# Remove the AIO configuration relating to the use
-# of container artifacts. This needs to be done
-# because the container artifacts do not exist yet.
-./scripts/artifacts-building/remove-container-aio-config.sh
-
 # Set override vars for the artifact build
-cd scripts/artifacts-building/
-cp user_*.yml /etc/openstack_deploy/
+cd ${SCRIPT_PATH}/../
 
 # If we have no pre-built python artifacts available, the whole
 # container build process will fail as it is unable to find the
@@ -128,28 +132,27 @@ if ! python_artifacts_available; then
 fi
 
 # Run playbooks
-cd /opt/rpc-openstack/openstack-ansible/playbooks
+cd /opt/openstack-ansible/playbooks
 
 # If the apt artifacts are not available, then this is likely
 # a PR test which is not going to upload anything, so the
 # artifacts we build do not need to be strictly set to use
 # the RPC-O apt repo.
-if apt_artifacts_available; then
-    # The host must only have the base Ubuntu repository configured.
-    # All updates (security and otherwise) must come from the RPC-O apt artifacting.
-    # The host sources are modified to ensure that when the containers are prepared
-    # they have our mirror included as the default. This happens because in the
-    # lxc_hosts role the host apt sources are copied into the container cache.
-    openstack-ansible /opt/rpc-openstack/rpcd/playbooks/configure-apt-sources.yml \
-                      -e "host_ubuntu_repo=http://mirror.rackspace.com/ubuntu" \
-                      ${ANSIBLE_PARAMETERS}
-fi
+
+# The host must only have the base Ubuntu repository configured.
+# All updates (security and otherwise) must come from the RPC-O apt artifacting.
+# The host sources are modified to ensure that when the containers are prepared
+# they have our mirror included as the default. This happens because in the
+# lxc_hosts role the host apt sources are copied into the container cache.
+openstack-ansible /opt/rpc-openstack/playbooks/configure-apt-sources.yml \
+                  -e "host_ubuntu_repo=http://mirror.rackspace.com/ubuntu" \
+                  ${ANSIBLE_PARAMETERS}
 
 # Setup the host
-openstack-ansible setup-hosts.yml --limit lxc_hosts,hosts
+openstack-ansible setup-hosts.yml --limit "lxc_hosts,hosts"
 
-# Move back to artifacts-building dir
-cd /opt/rpc-openstack/scripts/artifacts-building/
+# Move back to SCRIPT_PATH dir
+cd ${SCRIPT_PATH}/../
 
 # Build the base container
 openstack-ansible containers/artifact-build-chroot.yml \
@@ -195,9 +198,8 @@ if [[ "$(echo ${PUSH_TO_MIRROR} | tr [a-z] [A-Z])" == "YES" ]]; then
     # Ensure that the repo server public key is a known host
     grep "${REPO_HOST}" ~/.ssh/known_hosts || echo "${REPO_HOST} $(cat $REPO_HOST_PUBKEY)" >> ~/.ssh/known_hosts
 
-    # Create the Ansible inventory for the upload
-    echo '[mirrors]' > /opt/inventory
-    echo "repo ansible_host=${REPO_HOST} ansible_user=${REPO_USER} ansible_ssh_private_key_file='${REPO_KEYFILE}' " >> /opt/inventory
+    # Basic host/mirror inventory
+    envsubst < ${SCRIPT_PATH}/../inventory > /opt/inventory
 
     # Ship it!
     openstack-ansible containers/artifact-upload.yml -i /opt/inventory -v
@@ -209,4 +211,3 @@ if [[ "$(echo ${PUSH_TO_MIRROR} | tr [a-z] [A-Z])" == "YES" ]]; then
 else
   echo "Skipping upload to rpc-repo as the PUSH_TO_MIRROR env var is not set to 'YES'."
 fi
-

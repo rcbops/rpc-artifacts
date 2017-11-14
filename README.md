@@ -1,6 +1,6 @@
 # Artifacts documentation
 
-#### Overview
+## Overview
 
 RPC-O builds and uses the following artifacts:
 
@@ -23,6 +23,7 @@ RPC-O builds and uses the following artifacts:
 
 Artifacts in RPC-O are both built and consumed using scripts in this
 directory.
+
 
 #### Artifact Build Process
 
@@ -101,17 +102,17 @@ for it if the build is successful. To replace artifacts for a series,
 execute the periodic job for the series with ``REPLACE_ARTIFACTS`` set to
 ``YES``.
 
-#### Artifact Consumption Process
+
+##### Artifact Consumption Process
 
 Artifacts are consumed by implementing the appropriate variable overrides for
 OSA to consume our artifacts instead of using the default upstream artifacts.
 
 * Apt artifact consumption configuration is implemented in
-  ``group_vars/all/apt.yml`` and in the lower part of
-  ``rpcd/etc/openstack_deploy/user_rpco_variables_defaults.yml``.
+  ``group_vars/all/apt.yml``.
 
 * Git and python artifacts are staged using
-  ``rpcd/playbooks/stage-python-artifacts.yml``, then consumed as they are in
+  ``playbooks/stage-python-artifacts.yml``, then consumed as they are in
   any normal RPC-O/OSA deployment. The RPC-O deployment script skips the
   repo-build playbook to save time, but changes in the repo-build process in
   OSA mean that if the repo-build playbook is run it will skip all the build
@@ -126,4 +127,3 @@ OSA to consume our artifacts instead of using the default upstream artifacts.
 As RPC-O executes build tests in PR's where the value for ``rpc_release`` is
 being changed in the PR, the AIO build process has been designed to adapt
 based on whether artifacts exist for the given release or not.
-

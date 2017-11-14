@@ -124,8 +124,8 @@
 
 - name: Create artifact container
   hosts: localhost
-  gather_facts: no
   connection: local
+  gather_facts: no
   vars_files:
     - container-vars.yml
   vars:

@@ -136,6 +136,8 @@ def get_package_list(distro, path, var_blacklist, pkg_blacklist):
             try:
                 for key, values in loaded_config.items():
                     key = key.lower()
+                    if isinstance(values, str):
+                        values = [values]
                     for type_of_package in BUILT_IN_DISTRO_PACKAGE_VARS:
                         if (key.endswith(type_of_package) and
                                 key not in var_blacklist):
@@ -183,4 +185,3 @@ if __name__ == '__main__':
     call_term['from'] = sys.argv[2:]
     call_terms = [call_term]
     print(json.dumps(LookupModule().run(terms=call_terms), indent=4, sort_keys=True))
-

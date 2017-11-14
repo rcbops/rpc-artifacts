@@ -50,6 +50,7 @@ export RPC_ARTIFACTS_PUBLIC_FOLDER=${RPC_ARTIFACTS_PUBLIC_FOLDER:-/var/www/repo}
 # We do not want to rewrite the host apt sources when executing bootstrap-ansible
 export HOST_SOURCES_REWRITE="no"
 
+export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 ## Main ----------------------------------------------------------------------
 
@@ -61,12 +62,6 @@ elif [ -z ${GPG_PRIVATE+x} ] || [ -z ${GPG_PUBLIC+x} ]; then
   exit 1
 fi
 
-# The derive-artifact-version.sh script expects the git clone to
-# be at /opt/rpc-openstack, so we link the current folder there.
-if [[ "${PWD}" != "/opt/rpc-openstack" ]]; then
-  ln -sfn ${PWD} /opt/rpc-openstack
-fi
-
 # Remove any previous installed plugins, libraries,
 # facts and ansible/openstack-ansible refs. This
 # ensures that as we upgrade/downgrade on the long
@@ -74,11 +69,10 @@ fi
 # from previously installed/configured items.
 rm -rf /etc/ansible /etc/openstack_deploy /usr/local/bin/ansible* /usr/local/bin/openstack-ansible*
 
-# Bootstrap Ansible
-# This script is sourced to ensure that the common
-# functions and vars are available.
-source scripts/bootstrap-ansible.sh
-cp scripts/artifacts-building/apt/lookup/* /etc/ansible/roles/plugins/lookup/
+# Run basic setup
+source ${SCRIPT_PATH}/../setup/artifact-setup.sh
+
+cp ${SCRIPT_PATH}/lookup/* /etc/ansible/roles/plugins/lookup/
 
 # Figure out when it is safe to automatically replace artifacts
 if [[ "$(echo ${PUSH_TO_MIRROR} | tr [a-z] [A-Z])" == "YES" ]]; then
@@ -123,20 +117,17 @@ set -x
 # Ensure that the repo server public key is a known host
 grep "${REPO_HOST}" ~/.ssh/known_hosts || echo "${REPO_HOST} $(cat $REPO_HOST_PUBKEY)" >> ~/.ssh/known_hosts
 
-# Create an inventory to use
-echo '[all]' > /opt/inventory
-echo "localhost ansible_python_interpreter='/usr/bin/python2'" >> /opt/inventory
-echo '[mirrors]' >> /opt/inventory
-echo "repo ansible_host=${REPO_HOST} ansible_user=${REPO_USER} ansible_ssh_private_key_file='${REPO_KEYFILE}' " >> /opt/inventory
+# Basic host/mirror inventory
+envsubst < ${SCRIPT_PATH}/../inventory > /opt/inventory
 
 # Remove the previously used rpc-repo.log file to prevent
 # it growing too large. We want a fresh log for every job.
 [ -e /var/log/rpc-repo.log ] && rm -f /var/log/rpc-repo.log
 
 # Execute the playbooks
-cd ${BASE_DIR}/scripts/artifacts-building/apt
+cd ${SCRIPT_PATH}
 ansible-playbook -i /opt/inventory ${ANSIBLE_PARAMETERS} aptly-pre-install.yml
 ansible-playbook -i /opt/inventory ${ANSIBLE_PARAMETERS} aptly-all.yml
 
-source /opt/rpc-openstack/openstack-ansible/scripts/openstack-ansible.rc
+source /opt/openstack-ansible/scripts/openstack-ansible.rc
 ansible-playbook -i /opt/inventory ${ANSIBLE_PARAMETERS} apt-artifacts-testing.yml
