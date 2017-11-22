@@ -36,7 +36,7 @@
           - "--quiet"
           - "--stats"
           - "--log-file='/var/log/rpc-repo.log'"
-          - "--chown={{ webservice_owner }}:www-data"
+          - "--chown='{{ webservice_owner }}:www-data'"
       register: synchronize
       until: synchronize | success
       retries: 5
@@ -113,7 +113,7 @@
           - "--quiet"
           - "--stats"
           - "--log-file='/var/log/rpc-repo.log'"
-          - "--chown={{ webservice_owner }}:www-data"
+          - "--chown='{{ webservice_owner }}:www-data'"
       register: synchronize
       until: synchronize | success
       retries: 5
