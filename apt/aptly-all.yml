@@ -32,8 +32,6 @@
         dest: "{{ artifacts_aptrepos_dest_folder | dirname }}"
         mode: pull
         delete: yes
-        group: no
-        owner: no
         rsync_opts:
           - "--quiet"
           - "--stats"
