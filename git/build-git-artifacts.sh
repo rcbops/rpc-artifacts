@@ -108,6 +108,10 @@ if [[ "$(echo ${PUSH_TO_MIRROR} | tr [a-z] [A-Z])" == "YES" ]]; then
         # Ensure that the repo server public key is a known host
         grep "${REPO_HOST}" ~/.ssh/known_hosts || echo "${REPO_HOST} $(cat $REPO_HOST_PUBKEY)" >> ~/.ssh/known_hosts
 
+        # Ensure that the inventory contains all the right
+        # information, including the value for REPO_KEYFILE
+        envsubst < ${SCRIPT_PATH}/../inventory > /opt/inventory
+
         # Upload the artifacts to rpc-repo
         openstack-ansible -i /opt/inventory \
                           ${SCRIPT_PATH}/openstackgit-push-to-mirror.yml \
