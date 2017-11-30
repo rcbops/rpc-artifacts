@@ -29,9 +29,9 @@ rpc_series: "{{ rpc_release.split('.')[0] }}"
 
 # Prepare for aptly, repos to clone.
 aptly_clone_this_first:
-  - repo: "https://github.com/evrardjp/ansible-role-aptly.git"
+  - repo: "https://github.com/infOpen/ansible-role-aptly.git"
     dest: "{{ ansible_roles_folder }}/infOpen.aptly"
-    version: "rax"
+    version: "ca975fe854831c0694c0b5dc56be9ac056b7602c"
 
 aptly_custom_gpg_key_file: "{{ artifacts_root_folder }}/aptly.private.key"
 aptly_custom_gpg_pubkey_file: "{{ artifacts_root_folder }}/aptly.public.key"
