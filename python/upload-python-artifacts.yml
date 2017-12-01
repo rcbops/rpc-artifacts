@@ -65,7 +65,7 @@
         recursive: yes
         rsync_opts:
           - "--chown=nginx:www-data"
-          - "--exclude index.html"
+          - "--exclude=index.html"
       register: synchronize
       until: synchronize | success
       retries: 5
