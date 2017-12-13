@@ -20,10 +20,12 @@ set -e -u -x
 export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 ## Main ----------------------------------------------------------------------
-# The derive-artifact-version.py script expects the git clone to
-# be at /opt/rpc-openstack, so we link the current folder there.
-if [[ "${PWD}" != "/opt/rpc-openstack" ]]; then
-  ln -sfn ${PWD} /opt/rpc-openstack
+
+# The artifact scripts expect rpc-openstack to be checked
+# out at /opt/rpc-openstack, so we need to make sure that
+# it is there.
+if [[ ! -e "/opt/rpc-openstack" ]]; then
+  git clone https://github.com/rcbops/rpc-openstack.git /opt/rpc-openstack
 fi
 
 # Install RPC-OpenStack
