@@ -93,16 +93,30 @@ function safe_to_replace_artifacts {
   # versions or if there is no rc branch. When this is the case, the function
   # will return 0.
 
-  rc_branch="master-rc"
+  # We can only use this method once this file exists in the RC branch, so
+  # we have to implement the new method and a fall back to the old method.
 
-  if git show origin/${rc_branch} &>/dev/null; then
-    rc_branch_version="$(git show origin/${rc_branch}:group_vars/all/release.yml \
-                         | awk '/rpc_release/{print $2}' | tr -d '"')"
-    if [[ "${rc_branch_version}" == "${RPC_RELEASE}" ]]; then
-      return 1
-    else
-      return 0
-    fi
+  rc_branch="master-rc"
+  new_file_to_fetch="origin/${rc_branch}:playbooks/vars/rpc-release.yml"
+  old_file_to_fetch="origin/${rc_branch}:etc/openstack_deploy/group_vars/all/release.yml"
+  release_data_file="${WORKSPACE}/rc-release-data.yml"
+
+  # new method
+  if git cat-file -e ${new_file_to_fetch} 2>/dev/null; then
+    git show ${new_file_to_fetch} > ${release_data_file}
+    export RC_BRANCH_VERSION=$(${GATING_PATH}/get-rpc_release.py ${release_data_file})
+
+  # old method
+  elif git cat-file -e ${old_file_to_fetch} 2>/dev/null; then
+    git show ${old_file_to_fetch} > ${release_data_file}
+    export RC_BRANCH_VERSION=$(awk '/^rpc_release/{print $2}' ${release_data_file} | tr -d '"')
+
+  else
+    export RC_BRANCH_VERSION="none"
+  fi
+
+  if [[ "${RC_BRANCH_VERSION}" == "${RPC_RELEASE}" ]]; then
+    return 1
   else
     return 0
   fi
