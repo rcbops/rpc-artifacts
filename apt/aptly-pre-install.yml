@@ -32,6 +32,7 @@
       with_items:
         - "{{ artifacts_root_folder }}"
         - "{{ ansible_roles_folder }}"
+
     - name: Fetch aptly role and rabbitmq vars files
       git:
         repo: "{{ item.repo }}"
