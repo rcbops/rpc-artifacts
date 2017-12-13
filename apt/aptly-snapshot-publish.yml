@@ -29,17 +29,20 @@
   shell: 'aptly publish snapshot -distribution="{{ rpc_release }}-{{ distribution_release }}" miko-{{ rpc_release }}-{{ distribution_release }} integrated'
   register: aptly_snapshot_publish
   # This condition should always be true when recreating snapshots, false when reusing.
-  when: aptly_already_published.rc == 1
+  when:
+    - "aptly_already_published.rc == 1"
   failed_when:
-    - aptly_snapshot_publish.rc != 0
-    - aptly_snapshot_publish.stderr.find('already used') == -1
-  changed_when: aptly_snapshot_publish.stderr.find('already used') == -1
+    - "aptly_snapshot_publish.rc != 0"
+    - "aptly_snapshot_publish.stderr.find('already used') == -1"
+  changed_when:
+    - "aptly_snapshot_publish.stderr.find('already used') == -1"
 
 - name: Publish snapshot into public folder (no merge)
   shell: 'aptly publish snapshot -distribution="{{ rpc_release }}-{{ distribution_release }}" {{ item.src }} independant/{{ item.dest }}'
   with_items: "{{ aptly_n_mapping[rpc_series][distribution_release] }}"
   register: aptly_snapshot_nomerge_publish
   failed_when:
-    - aptly_snapshot_nomerge_publish.rc != 0
-    - aptly_snapshot_nomerge_publish.stderr.find('already used') == -1
-  changed_when: aptly_snapshot_nomerge_publish.stderr.find('already used') == -1
+    - "aptly_snapshot_nomerge_publish.rc != 0"
+    - "aptly_snapshot_nomerge_publish.stderr.find('already used') == -1"
+  changed_when:
+    - "aptly_snapshot_nomerge_publish.stderr.find('already used') == -1"

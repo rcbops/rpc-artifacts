@@ -42,7 +42,8 @@
       register: rabbitmq_search
       failed_when: false
       changed_when: false
-      when: aptly_mirror_do_updates | bool
+      when:
+        - "aptly_mirror_do_updates | bool"
 
     - name: Fetch Rabbitmq to feed frozen repo
       get_url:
@@ -51,8 +52,8 @@
         dest: "/tmp/{{ _rabbitmq_package_url | basename }}"
         sha256sum: "{{ _rabbitmq_package_sha256 }}"
       when:
-        - aptly_mirror_do_updates | bool
-        - rabbitmq_search.stdout.find(_rabbitmq_package_version) == -1
+        - "aptly_mirror_do_updates | bool"
+        - "rabbitmq_search.stdout.find(_rabbitmq_package_version) == -1"
       register: rabbitmq_download
       until: rabbitmq_download|success
       retries: 5
@@ -62,9 +63,10 @@
       command: su - aptly -c "aptly repo add rabbitmq-downloaded-packages-{{ rpc_release }}-ALL /tmp/{{ _rabbitmq_package_url | basename }}"
       register: aptly_repo_add_output
       when:
-        - aptly_mirror_do_updates | bool
-        - rabbitmq_search.stdout.find(_rabbitmq_package_version) == -1
+        - "aptly_mirror_do_updates | bool"
+        - "rabbitmq_search.stdout.find(_rabbitmq_package_version) == -1"
 
     - debug:
         msg: "{{ aptly_repo_add_output }}"
-      when: aptly_mirror_do_updates | bool
+      when:
+        - "aptly_mirror_do_updates | bool"

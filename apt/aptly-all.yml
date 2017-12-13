@@ -41,7 +41,8 @@
       until: synchronize | success
       retries: 5
       delay: 5
-      when: "{{ lookup('ENV','PULL_FROM_MIRROR') | bool }}"
+      when:
+        - lookup('ENV','PULL_FROM_MIRROR') | bool
 
 
 
@@ -70,7 +71,8 @@
         - aptly_snapshot_create
 
     - include: aptly-snapshot-publish.yml
-      when: "{{ lookup('ENV','PUBLISH_SNAPSHOT') | bool }}"
+      when:
+        - lookup('ENV','PUBLISH_SNAPSHOT') | bool
       with_items: "{{ aptly_miko_mapping[rpc_series].keys() }}"
       loop_control:
         loop_var: distribution_release
@@ -101,7 +103,8 @@
       with_items:
         - "{{ aptly_user_home }}"
         - "{{ artifacts_root_folder }}"
-      when: "{{ lookup('ENV','PUSH_TO_MIRROR') | bool }}"
+      when:
+        - lookup('ENV','PUSH_TO_MIRROR') | bool
 
     - name: Synchronize artifacts
       synchronize:
@@ -118,7 +121,8 @@
       until: synchronize | success
       retries: 5
       delay: 5
-      when: "{{ lookup('ENV','PUSH_TO_MIRROR') | bool }}"
+      when:
+        - lookup('ENV','PUSH_TO_MIRROR') | bool
 
     - name: Sync apt public key with mirror
       copy:
@@ -126,4 +130,5 @@
         dest: "{{ aptly_custom_gpg_pubkey_file }}"
         owner: "{{ webservice_owner }}"
         group: "www-data"
-      when: "{{ lookup('ENV','PUSH_TO_MIRROR') | bool }}"
+      when:
+        - lookup('ENV','PUSH_TO_MIRROR') | bool

@@ -22,7 +22,7 @@ ansible_roles_folder: "/etc/ansible/roles"
 # rpc-repo mirror details
 webservice_owner: "nginx"
 
-rpc_release: "{{ lookup('pipe', playbook_dir + '/../derive-artifact-version.py').strip() }}"
+rpc_release: "{{ lookup('env', 'RPC_RELEASE') }}"
 
 # We need the series (major version) for the snapshot mappings
 rpc_series: "{{ rpc_release.split('.')[0] }}"

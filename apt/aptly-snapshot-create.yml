@@ -43,7 +43,7 @@
   shell: "aptly publish drop {{ item.split(' ')[1] }} {{ item.split(' ')[0] }}"
   with_items: "{{ aptly_existing_published_snapshots_list.stdout_lines }}"
   when:
-    - "{{ lookup('ENV','RECREATE_SNAPSHOTS') | bool }}"
+    - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
     - "item.find('{{ rpc_release }}') != -1"
     - "item.find('{{ distribution_release }}') != -1"
   failed_when: false
@@ -52,7 +52,7 @@
   shell: "aptly snapshot drop {{ item }}"
   with_items: "{{ aptly_existing_snapshots_list.stdout_lines }}"
   when:
-    - "{{ lookup('ENV','RECREATE_SNAPSHOTS') | bool }}"
+    - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
     - "item.find('miko-{{ rpc_release }}-{{ distribution_release }}') != -1"
   failed_when: false
 
@@ -60,7 +60,7 @@
   shell: "aptly snapshot drop {{ item }}"
   with_items: "{{ aptly_existing_snapshots_list.stdout_lines }}"
   when:
-    - "{{ lookup('ENV','RECREATE_SNAPSHOTS') | bool }}"
+    - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
     - "item.find('slushie-{{ rpc_release }}') != -1"
     - "item.find('{{ distribution_release }}') != -1 or item.find('ALL') != -1"
   failed_when: false
@@ -71,7 +71,9 @@
   with_subelements:
     - "{{ aptly_repo_list.results }}"
     - "stdout_lines"
-  failed_when: aptly_snapshot_create.rc != 0 and aptly_snapshot_create.stderr.find('already exists') == -1
+  failed_when:
+    - "aptly_snapshot_create.rc != 0"
+    - "aptly_snapshot_create.stderr.find('already exists') == -1"
   changed_when: aptly_snapshot_create.stderr.find('already exists') == -1
 
 - name: Fetch snapshot list
@@ -87,9 +89,10 @@
   shell: "aptly snapshot merge {{ aptly_snapshot_merge_flags }} miko-{{ rpc_release }}-{{ distribution_release }} {{ aptly_miko_mapping[rpc_series][distribution_release] | join(' ') }}"
   register: aptly_snapshot_merge_create
   failed_when:
-    - aptly_snapshot_merge_create.rc != 0
-    - aptly_snapshot_merge_create.stderr.find('already exists') == -1
-  changed_when: aptly_snapshot_merge_create.stderr.find('already exists') == -1
+    - "aptly_snapshot_merge_create.rc != 0"
+    - "aptly_snapshot_merge_create.stderr.find('already exists') == -1"
+  changed_when:
+    - "aptly_snapshot_merge_create.stderr.find('already exists') == -1"
   tags:
     - aptly_snapshot_merge
     - aptly_snapshot
