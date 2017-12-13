@@ -49,12 +49,7 @@ rm -f /opt/list
 source ${SCRIPT_PATH}/../setup/artifact-setup.sh
 
 # Set the galera client version number
-GALERA_CLIENT_VERSION=$(${SCRIPT_PATH}/../derive-artifact-version.py /etc/ansible/roles/galera_client/defaults/main.yml galera_client_major_version || echo "10.1")
-if ! grep -q '^galera_client_major_version' /etc/openstack_deploy/user_artifact_variables.yml; then
-  echo "galera_client_major_version: ${GALERA_CLIENT_VERSION}" | tee -a /etc/openstack_deploy/user_artifact_variables.yml
-else
-  sed -i "s|^galera_client_major_version.*|galera_client_major_version: ${GALERA_CLIENT_VERSION}|" /etc/openstack_deploy/user_artifact_variables.yml
-fi
+set_galera_client_version
 
 # Bootstrap Ansible
 # This script is sourced to ensure that the common

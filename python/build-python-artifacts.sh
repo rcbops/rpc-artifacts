@@ -53,10 +53,8 @@ cd /opt/rpc-openstack
 echo "repo_build_wheel_selective: no" >> /etc/openstack_deploy/user_osa_variables_overrides.yml
 echo "repo_build_venv_selective: no" >> /etc/openstack_deploy/user_osa_variables_overrides.yml
 
-if [[ -f "/etc/ansible/roles/galera_client/defaults/main.yml" ]]; then
-  GALERA_CLIENT_VERSION=$(${SCRIPT_PATH}/../derive-artifact-version.py /etc/ansible/roles/galera_client/defaults/main.yml galera_client_major_version || echo "10.1")
-  sed -i "s|^galera_client_major_version.*|galera_client_major_version: ${GALERA_CLIENT_VERSION}|" /etc/openstack_deploy/user_rcbops_artifacts_building.yml
-fi
+# Set the galera client version number
+set_galera_client_version
 
 # Bootstrap the AIO configuration
 cd /opt/openstack-ansible

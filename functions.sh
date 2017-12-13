@@ -28,11 +28,7 @@ export RPCD_DIR="${BASE_DIR}"
 export HOST_SOURCES_REWRITE=${HOST_SOURCES_REWRITE:-"yes"}
 export HOST_UBUNTU_REPO=${HOST_UBUNTU_REPO:-"http://mirror.rackspace.com/ubuntu"}
 export HOST_RCBOPS_REPO=${HOST_RCBOPS_REPO:-"http://rpc-repo.rackspace.com"}
-
-# Derive the rpc_release version from the group vars
-# NOTE(cloudnull): Assume the scripts path is in the process directorie
-#                  otherwise fallback to the legacy path.
-export RPC_RELEASE="$(${SCRIPT_PATH}/../derive-artifact-version.py || ${SCRIPT_PATH}/derive-artifact-version.py)"
+export RPC_RELEASE="$(${BASE_DIR}/scripts/get-rpc_release.py)"
 
 # Read the OS information
 source /etc/os-release
@@ -110,4 +106,24 @@ function safe_to_replace_artifacts {
   else
     return 0
   fi
+}
+
+function set_galera_client_version {
+
+  # From Ocata onwards the galera_client/galera_server version
+  # is not set in the usual way - it uses a var in the distro
+  # package list. As such the py_pkgs lookup cannot resolve it.
+  # To work around this we work around it by setting the value
+  # in the overrides.
+
+  # Get the galera client version number
+  GALERA_CLIENT_VERSION=$(awk '/galera_client_major_version/ {print $2}' /etc/ansible/roles/galera_client/defaults/main.yml)
+
+  # Set the galera client version number
+  if ! grep -q '^galera_client_major_version' ${OA_OVERRIDES}; then
+    echo "galera_client_major_version: ${GALERA_CLIENT_VERSION}" | tee -a ${OA_OVERRIDES}
+  else
+    sed -i "s|^galera_client_major_version.*|galera_client_major_version: ${GALERA_CLIENT_VERSION}|" ${OA_OVERRIDES}
+  fi
+
 }
