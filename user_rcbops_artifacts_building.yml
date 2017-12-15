@@ -94,3 +94,8 @@ lxc_cache_prep_pre_commands: |
     else
       rm -f /etc/resolv.conf
     fi
+
+# To ensure that playbooks targeted at localhost make
+# use of the host's python interpreter instead of the
+# ansible venv, we hard set the intepreter.
+ansible_python_interpreter: "/usr/bin/python2"

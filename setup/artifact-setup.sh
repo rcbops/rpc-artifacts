@@ -38,12 +38,6 @@ else
   ln -sfn ${PWD} /opt/rpc-openstack/scripts/artifacts-building
 fi
 
-# The script to figure out the RPC_RELEASE does not work
-# unless python-yaml is installed. This is a temporary
-# workaround.
-# TODO(odyssey4me): Remove this once RO-3268 is resolved.
-apt-get update && apt-get install -y python-yaml
-
 # Install RPC-OpenStack
 pushd /opt/rpc-openstack
   OSA_RELEASE="${OSA_RELEASE:-stable/pike}" ./scripts/install.sh
@@ -52,17 +46,18 @@ popd
 # Source our functions
 source ${SCRIPT_PATH}/../functions.sh
 
+# Bootstrap Ansible using OSA
+# We give it an a-r-r file which does not exist as the RPC-O install
+# process has already downloaded the roles.
+pushd /opt/openstack-ansible
+  bash -c "ANSIBLE_ROLE_FILE='/tmp/does-not-exist' scripts/bootstrap-ansible.sh"
+popd
+
 # Copy the extra-var override file over
 cp ${SCRIPT_PATH}/../user_*.yml /etc/openstack_deploy/
 
-# Set the python interpreter for consistency
-if ! grep -q '^ansible_python_interpreter' ${OA_OVERRIDES}; then
-  echo 'ansible_python_interpreter: "/usr/bin/python2"' | tee -a ${OA_OVERRIDES}
-fi
-
-# Set the AIO config bootstrap options
 if apt_artifacts_available; then
-    # Prevent the AIO bootstrap from re-implementing
-    # the updates, backports and UCA sources.
-    export BOOTSTRAP_OPTS='{ "bootstrap_host_apt_distribution_suffix_list": [], "uca_enable": "False" }'
+  # Prevent the AIO bootstrap from re-implementing
+  # the updates, backports and UCA sources.
+  export BOOTSTRAP_OPTS='{ "bootstrap_host_apt_distribution_suffix_list": [], "uca_enable": "False" }'
 fi

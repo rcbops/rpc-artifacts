@@ -48,11 +48,6 @@ rm -f /opt/list
 # Run basic setup
 source ${SCRIPT_PATH}/../setup/artifact-setup.sh
 
-# Bootstrap Ansible using OSA
-pushd /opt/openstack-ansible
-  bash -c "/opt/openstack-ansible/scripts/bootstrap-ansible.sh"
-popd
-
 # Set the galera client version number
 set_galera_client_version
 

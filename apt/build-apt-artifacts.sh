@@ -69,11 +69,6 @@ rm -rf /etc/ansible /etc/openstack_deploy /usr/local/bin/ansible* /usr/local/bin
 # Run basic setup
 source ${SCRIPT_PATH}/../setup/artifact-setup.sh
 
-# Bootstrap Ansible using OSA
-pushd /opt/openstack-ansible
-  bash -c "/opt/openstack-ansible/scripts/bootstrap-ansible.sh"
-popd
-
 cp ${SCRIPT_PATH}/lookup/* /etc/ansible/roles/plugins/lookup/
 
 # Figure out when it is safe to automatically replace artifacts

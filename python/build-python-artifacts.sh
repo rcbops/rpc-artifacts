@@ -44,11 +44,6 @@ export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 # Run basic setup
 source ${SCRIPT_PATH}/../setup/artifact-setup.sh
 
-# Bootstrap Ansible using OSA
-pushd /opt/openstack-ansible
-  bash -c "/opt/openstack-ansible/scripts/bootstrap-ansible.sh"
-popd
-
 # Set override vars for the artifact build
 echo "repo_build_wheel_selective: no" >> ${OA_OVERRIDES}
 echo "repo_build_venv_selective: no" >> ${OA_OVERRIDES}
