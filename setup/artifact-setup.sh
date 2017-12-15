@@ -23,8 +23,10 @@ export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 # The artifact scripts expect rpc-openstack to be checked
 # out at /opt/rpc-openstack, so we need to make sure that
-# it is there.
-if [[ ! -e "/opt/rpc-openstack" ]]; then
+# it is there. Unfortunately in some of our gating systems
+# this may be a symlink and the folder may not exist, so
+# we cannot use a file test.
+if ! ls -1 /opt | grep -q ^rpc-openstack$; then
   git clone https://github.com/rcbops/rpc-openstack.git /opt/rpc-openstack
 fi
 
