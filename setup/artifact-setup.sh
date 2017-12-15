@@ -23,11 +23,19 @@ export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 # The artifact scripts expect rpc-openstack to be checked
 # out at /opt/rpc-openstack, so we need to make sure that
-# it is there. Unfortunately in some of our gating systems
-# this may be a symlink and the folder may not exist, so
-# we cannot use a file test.
-if ! ls -1 /opt | grep -q ^rpc-openstack$; then
+# it is there. The folder the script may be run from could
+# be another folder (as it is in jenkins), so we check
+# whether the folder has 'rpc-openstack' in the name. If it
+# does, we symlink it. If not, then we clone and replace
+# the artifacts-building submodule with the current working
+# directory. This enables testing using the artifacts repo
+# on its own.
+if [[ "${PWD}" != "/opt/rpc-openstack" ]] && [[ "${PWD}" =~ "rpc-openstack" ]]; then
+  ln -sfn ${PWD} /opt/rpc-openstack
+else
   git clone https://github.com/rcbops/rpc-openstack.git /opt/rpc-openstack
+  rm -rf /opt/rpc-openstack/scripts/artifacts-building
+  ln -sfn ${PWD} /opt/rpc-openstack/scripts/artifacts-building
 fi
 
 # The script to figure out the RPC_RELEASE does not work
