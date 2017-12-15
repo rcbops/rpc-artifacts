@@ -23,12 +23,14 @@ export REPO_KEYFILE=${REPO_KEYFILE:-~/.ssh/id_rsa}
 export BASE_DIR=${BASE_DIR:-"/opt/rpc-openstack"}
 export OA_DIR="/opt/openstack-ansible"
 export OA_OVERRIDES='/etc/openstack_deploy/user_osa_variables_overrides.yml'
-export RPCD_DIR="${BASE_DIR}"
 
 export HOST_SOURCES_REWRITE=${HOST_SOURCES_REWRITE:-"yes"}
 export HOST_UBUNTU_REPO=${HOST_UBUNTU_REPO:-"http://mirror.rackspace.com/ubuntu"}
 export HOST_RCBOPS_REPO=${HOST_RCBOPS_REPO:-"http://rpc-repo.rackspace.com"}
 export RPC_RELEASE="$(${BASE_DIR}/scripts/get-rpc_release.py)"
+
+export ENABLE_ARTIFACTS_APT=${ENABLE_ARTIFACTS_APT:-"no"}
+export ENABLE_ARTIFACTS_PYT=${ENABLE_ARTIFACTS_PYT:-"no"}
 
 # Read the OS information
 source /etc/os-release
@@ -77,7 +79,7 @@ function container_artifacts_available {
 
   CHECK_URL="${HOST_RCBOPS_REPO}/meta/1.0/index-system"
 
-  if curl --silent --fail ${CHECK_URL} | grep "^${ID};${DISTRIB_CODENAME};.*${RPC_RELEASE};" > /dev/null; then
+  if curl --silent --fail ${CHECK_URL} | grep -q "^${ID};${DISTRIB_CODENAME};.*${RPC_RELEASE};"; then
     return 0
   else
     return 1

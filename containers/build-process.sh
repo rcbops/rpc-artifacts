@@ -34,11 +34,12 @@ export PUSH_TO_MIRROR=${PUSH_TO_MIRROR:-no}
 # know it and use this checkout appropriately.
 export BASE_DIR=${PWD}
 
-# We want the role downloads to be done via git
-# This ensures that there is no race condition with the artifacts-git job
-export ANSIBLE_ROLE_FETCH_MODE="git-clone"
-
 export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
+
+# As container artifacts are built after apt & python artifacts,
+# they should be used if they are available.
+export ENABLE_ARTIFACTS_APT="yes"
+export ENABLE_ARTIFACTS_PYT="yes"
 
 ## Main ----------------------------------------------------------------------
 
@@ -47,11 +48,6 @@ rm -f /opt/list
 
 # Run basic setup
 source ${SCRIPT_PATH}/../setup/artifact-setup.sh
-
-# Bootstrap Ansible using OSA
-pushd /opt/openstack-ansible
-  bash -c "/opt/openstack-ansible/scripts/bootstrap-ansible.sh"
-popd
 
 # Set the galera client version number
 set_galera_client_version

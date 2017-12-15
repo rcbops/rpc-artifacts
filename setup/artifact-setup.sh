@@ -38,12 +38,6 @@ else
   ln -sfn ${PWD} /opt/rpc-openstack/scripts/artifacts-building
 fi
 
-# The script to figure out the RPC_RELEASE does not work
-# unless python-yaml is installed. This is a temporary
-# workaround.
-# TODO(odyssey4me): Remove this once RO-3268 is resolved.
-apt-get update && apt-get install -y python-yaml
-
 # Install RPC-OpenStack
 pushd /opt/rpc-openstack
   OSA_RELEASE="${OSA_RELEASE:-stable/pike}" ./scripts/install.sh
@@ -52,17 +46,22 @@ popd
 # Source our functions
 source ${SCRIPT_PATH}/../functions.sh
 
+# Prepare the relevant artifacts
+openstack-ansible -i 'localhost,' \
+                  -e 'apt_target_group=localhost' \
+                  -e "apt_artifacts_enabled=${ENABLE_ARTIFACTS_APT}" \
+                  -e "container_artifact_enabled=no" \
+                  -e "py_artifact_enabled=${ENABLE_ARTIFACTS_PYT}" \
+                  "${BASE_DIR}/playbooks/site-artifacts.yml"
+
+# Install OpenStack-Ansible
+openstack-ansible "${BASE_DIR}/playbooks/openstack-ansible-install.yml"
+
 # Copy the extra-var override file over
 cp ${SCRIPT_PATH}/../user_*.yml /etc/openstack_deploy/
 
-# Set the python interpreter for consistency
-if ! grep -q '^ansible_python_interpreter' ${OA_OVERRIDES}; then
-  echo 'ansible_python_interpreter: "/usr/bin/python2"' | tee -a ${OA_OVERRIDES}
-fi
-
-# Set the AIO config bootstrap options
 if apt_artifacts_available; then
-    # Prevent the AIO bootstrap from re-implementing
-    # the updates, backports and UCA sources.
-    export BOOTSTRAP_OPTS='{ "bootstrap_host_apt_distribution_suffix_list": [], "uca_enable": "False" }'
+  # Prevent the AIO bootstrap from re-implementing
+  # the updates, backports and UCA sources.
+  export BOOTSTRAP_OPTS='{ "bootstrap_host_apt_distribution_suffix_list": [], "uca_enable": "False" }'
 fi
