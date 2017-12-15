@@ -47,9 +47,6 @@ export PUBLISH_SNAPSHOT=${PUBLISH_SNAPSHOT:-yes}
 export RPC_ARTIFACTS_FOLDER=${RPC_ARTIFACTS_FOLDER:-/var/www/artifacts}
 export RPC_ARTIFACTS_PUBLIC_FOLDER=${RPC_ARTIFACTS_PUBLIC_FOLDER:-/var/www/repo}
 
-# We do not want to rewrite the host apt sources when executing bootstrap-ansible
-export HOST_SOURCES_REWRITE="no"
-
 export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 ## Main ----------------------------------------------------------------------
@@ -71,6 +68,11 @@ rm -rf /etc/ansible /etc/openstack_deploy /usr/local/bin/ansible* /usr/local/bin
 
 # Run basic setup
 source ${SCRIPT_PATH}/../setup/artifact-setup.sh
+
+# Bootstrap Ansible using OSA
+pushd /opt/openstack-ansible
+  bash -c "/opt/openstack-ansible/scripts/bootstrap-ansible.sh"
+popd
 
 cp ${SCRIPT_PATH}/lookup/* /etc/ansible/roles/plugins/lookup/
 
