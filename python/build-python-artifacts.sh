@@ -50,8 +50,8 @@ source ${SCRIPT_PATH}/../setup/artifact-setup.sh
 cd /opt/rpc-openstack
 
 # Set override vars for the artifact build
-echo "repo_build_wheel_selective: no" >> /etc/openstack_deploy/user_osa_variables_overrides.yml
-echo "repo_build_venv_selective: no" >> /etc/openstack_deploy/user_osa_variables_overrides.yml
+echo "repo_build_wheel_selective: no" >> ${OA_OVERRIDES}
+echo "repo_build_venv_selective: no" >> ${OA_OVERRIDES}
 
 # Set the galera client version number
 set_galera_client_version
