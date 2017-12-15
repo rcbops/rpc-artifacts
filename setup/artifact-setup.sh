@@ -32,7 +32,7 @@ export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 # on its own.
 if [[ "${PWD}" != "/opt/rpc-openstack" ]] && [[ "${PWD}" =~ "rpc-openstack" ]]; then
   ln -sfn ${PWD} /opt/rpc-openstack
-else
+elif [[ "${PWD}" != "/opt/rpc-openstack" ]]; then
   git clone https://github.com/rcbops/rpc-openstack.git /opt/rpc-openstack
   rm -rf /opt/rpc-openstack/scripts/artifacts-building
   ln -sfn ${PWD} /opt/rpc-openstack/scripts/artifacts-building
