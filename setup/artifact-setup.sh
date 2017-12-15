@@ -28,6 +28,12 @@ if [[ ! -e "/opt/rpc-openstack" ]]; then
   git clone https://github.com/rcbops/rpc-openstack.git /opt/rpc-openstack
 fi
 
+# The script to figure out the RPC_RELEASE does not work
+# unless python-yaml is installed. This is a temporary
+# workaround.
+# TODO(odyssey4me): Remove this once RO-3268 is resolved.
+apt-get update && apt-get install -y python-yaml
+
 # Install RPC-OpenStack
 pushd /opt/rpc-openstack
   OSA_RELEASE="${OSA_RELEASE:-stable/pike}" ./scripts/install.sh
