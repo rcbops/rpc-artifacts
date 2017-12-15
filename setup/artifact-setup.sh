@@ -33,12 +33,20 @@ pushd /opt/rpc-openstack
   OSA_RELEASE="${OSA_RELEASE:-stable/pike}" ./scripts/install.sh
 popd
 
+# Source our functions
+source ${SCRIPT_PATH}/../functions.sh
+
+# Copy the extra-var override file over
 cp ${SCRIPT_PATH}/../user_*.yml /etc/openstack_deploy/
 
 # Set the python interpreter for consistency
-if ! grep -q '^ansible_python_interpreter' /etc/openstack_deploy/user_artifact_variables.yml; then
-  echo 'ansible_python_interpreter: "/usr/bin/python2"' | tee -a /etc/openstack_deploy/user_artifact_variables.yml
+if ! grep -q '^ansible_python_interpreter' ${OA_OVERRIDES}; then
+  echo 'ansible_python_interpreter: "/usr/bin/python2"' | tee -a ${OA_OVERRIDES}
 fi
 
-# Source our functions
-source ${SCRIPT_PATH}/../functions.sh
+# Set the AIO config bootstrap options
+if apt_artifacts_available; then
+    # Prevent the AIO bootstrap from re-implementing
+    # the updates, backports and UCA sources.
+    export BOOTSTRAP_OPTS='{ "bootstrap_host_apt_distribution_suffix_list": [], "uca_enable": "False" }'
+fi
