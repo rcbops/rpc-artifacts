@@ -46,12 +46,16 @@ popd
 # Source our functions
 source ${SCRIPT_PATH}/../functions.sh
 
-# Bootstrap Ansible using OSA
-# We give it an a-r-r file which does not exist as the RPC-O install
-# process has already downloaded the roles.
-pushd /opt/openstack-ansible
-  bash -c "ANSIBLE_ROLE_FILE='/tmp/does-not-exist' scripts/bootstrap-ansible.sh"
-popd
+# Prepare the relevant artifacts
+openstack-ansible -i 'localhost,' \
+                  -e 'apt_target_group=localhost' \
+                  -e "apt_artifacts_enabled=${ENABLE_ARTIFACTS_APT}" \
+                  -e "container_artifact_enabled=no" \
+                  -e "py_artifact_enabled=${ENABLE_ARTIFACTS_PYT}" \
+                  "${BASE_DIR}/playbooks/site-artifacts.yml"
+
+# Install OpenStack-Ansible
+openstack-ansible "${BASE_DIR}/playbooks/openstack-ansible-install.yml"
 
 # Copy the extra-var override file over
 cp ${SCRIPT_PATH}/../user_*.yml /etc/openstack_deploy/

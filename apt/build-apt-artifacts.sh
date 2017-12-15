@@ -38,16 +38,17 @@ export PUSH_TO_MIRROR=${PUSH_TO_MIRROR:-no}
 # know it and use this checkout appropriately.
 export BASE_DIR=${PWD}
 
-# We want the role downloads to be done via git
-# This ensures that there is no race condition with the artifacts-git job
-export ANSIBLE_ROLE_FETCH_MODE="git-clone"
-
 # These are allowed to be flexible for the purpose of testing by hand.
 export PUBLISH_SNAPSHOT=${PUBLISH_SNAPSHOT:-yes}
 export RPC_ARTIFACTS_FOLDER=${RPC_ARTIFACTS_FOLDER:-/var/www/artifacts}
 export RPC_ARTIFACTS_PUBLIC_FOLDER=${RPC_ARTIFACTS_PUBLIC_FOLDER:-/var/www/repo}
 
 export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
+
+# As apt artifacts are the first to be built, no
+# artifacts should be used for this build process.
+export ENABLE_ARTIFACTS_APT="no"
+export ENABLE_ARTIFACTS_PYT="no"
 
 ## Main ----------------------------------------------------------------------
 

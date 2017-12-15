@@ -34,11 +34,12 @@ export PUSH_TO_MIRROR=${PUSH_TO_MIRROR:-no}
 # know it and use this checkout appropriately.
 export BASE_DIR=${PWD}
 
-# We want the role downloads to be done via git
-# This ensures that there is no race condition with the artifacts-git job
-export ANSIBLE_ROLE_FETCH_MODE="git-clone"
-
 export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
+
+# As python artifacts are built after apt artifacts,
+# they should be used if they are available.
+export ENABLE_ARTIFACTS_APT="yes"
+export ENABLE_ARTIFACTS_PYT="no"
 
 ## Main ----------------------------------------------------------------------
 # Run basic setup
