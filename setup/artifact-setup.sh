@@ -49,7 +49,7 @@ source ${SCRIPT_PATH}/../functions.sh
 # Prepare the relevant artifacts
 openstack-ansible -i 'localhost,' \
                   -e 'apt_target_group=localhost' \
-                  -e "apt_artifacts_enabled=${ENABLE_ARTIFACTS_APT}" \
+                  -e "apt_artifact_enabled=${ENABLE_ARTIFACTS_APT}" \
                   -e "container_artifact_enabled=no" \
                   -e "py_artifact_enabled=${ENABLE_ARTIFACTS_PYT}" \
                   "${BASE_DIR}/playbooks/site-artifacts.yml"
