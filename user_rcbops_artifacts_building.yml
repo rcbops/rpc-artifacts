@@ -99,3 +99,11 @@ lxc_cache_prep_pre_commands: |
 # use of the host's python interpreter instead of the
 # ansible venv, we hard set the intepreter.
 ansible_python_interpreter: "/usr/bin/python2"
+
+# To build the container artifacts, there is no pip.conf in order
+# to inform the installation process of the extra links needed to
+# access the python wheels needed for the installation. Unfortunately
+# we cannot use jinja in the strategy to use the config tag for the
+# default container artifact and not for the rest, so instead we
+# provide extra pip options here to cover what would be in pip.conf.
+pip_install_options: "--trusted-host {{ repo_release_path | netloc_no_port }} --find-links {{ repo_release_path }}/"
