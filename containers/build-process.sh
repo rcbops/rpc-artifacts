@@ -52,20 +52,16 @@ source ${SCRIPT_PATH}/../setup/artifact-setup.sh
 # Set the galera client version number
 set_galera_client_version
 
-# Bootstrap Ansible
-# This script is sourced to ensure that the common
-# functions and vars are available.
-cd /opt/openstack-ansible
-
 # Bootstrap the AIO configuration
+cd /opt/openstack-ansible
 bash -c "/opt/openstack-ansible/scripts/bootstrap-aio.sh"
+
+# Ensure the correct dir structure exists
+mkdir -p /etc/openstack_deploy/conf.d
 
 # Remove all host group allocations to ensure
 # that no containers are created in the inventory.
 find /etc/openstack_deploy/conf.d/ -type f -exec rm -f {} \;
-
-# Ensure the correct dir structure exists
-mkdir -p /etc/openstack_deploy/conf.d
 
 # Ensure the files and directories have mutable permissions
 find /etc/openstack_deploy/ -type d -exec chmod 0755 {} \;
@@ -94,9 +90,6 @@ fi
 if [[ "$(echo ${REPLACE_ARTIFACTS} | tr [a-z] [A-Z])" == "YES" ]]; then
   export PUSH_TO_MIRROR="YES"
 fi
-
-# Set override vars for the artifact build
-cd ${SCRIPT_PATH}/../
 
 # If we have no pre-built python artifacts available, the whole
 # container build process will fail as it is unable to find the
@@ -127,27 +120,11 @@ if ! python_artifacts_available; then
     echo "pip_lock_to_internal_repo: no" >> ${OA_OVERRIDES}
 fi
 
-# Run playbooks
-cd /opt/openstack-ansible/playbooks
-
-# If the apt artifacts are not available, then this is likely
-# a PR test which is not going to upload anything, so the
-# artifacts we build do not need to be strictly set to use
-# the RPC-O apt repo.
-
-# The host must only have the base Ubuntu repository configured.
-# All updates (security and otherwise) must come from the RPC-O apt artifacting.
-# The host sources are modified to ensure that when the containers are prepared
-# they have our mirror included as the default. This happens because in the
-# lxc_hosts role the host apt sources are copied into the container cache.
-openstack-ansible /opt/rpc-openstack/playbooks/configure-apt-sources.yml \
-                  -e "host_ubuntu_repo=http://mirror.rackspace.com/ubuntu" \
-                  ${ANSIBLE_PARAMETERS}
-
 # Setup the host
+cd /opt/openstack-ansible/playbooks
 openstack-ansible setup-hosts.yml --limit "lxc_hosts,hosts"
 
-# Move back to SCRIPT_PATH dir
+# Move back to SCRIPT_PATH parent dir
 cd ${SCRIPT_PATH}/../
 
 # Build the base container
