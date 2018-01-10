@@ -20,10 +20,6 @@ lxc_image_folder: "/var/cache/artifacts"
 built_container_artifact_metadata_file: "{{ lxc_image_folder }}/{{ image_name }}-{{ rpc_release }}-entry"
 webserver_container_artifacts_uri: "lxc-images"
 lxc_container_cache_path: "/var/cache/lxc/download"
-compression_ratio: 7
-xz_bin:
-  centos: xz
-  ubuntu: pxz
 architecture_mapping:
   x86_64: amd64
   ppc64le: ppc64el
