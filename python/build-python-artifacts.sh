@@ -38,8 +38,9 @@ export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 # As python artifacts are built after apt artifacts,
 # they should be used if they are available.
-export ENABLE_ARTIFACTS_APT="yes"
-export ENABLE_ARTIFACTS_PYT="no"
+if apt_artifacts_available; then
+  export ENABLE_ARTIFACTS_APT="yes"
+fi
 
 ## Main ----------------------------------------------------------------------
 # Run basic setup
@@ -70,7 +71,7 @@ find /etc/openstack_deploy/ -type f -exec chmod 0644 {} \;
 # a PR test which is not going to upload anything, so the
 # artifacts we build do not need to be strictly set to use
 # the RPC-O apt repo.
-if apt_artifacts_available; then
+if [[ "${ENABLE_ARTIFACTS_APT}" == "yes" ]]; then
     # The python artifacts are not available at this point, so we need to
     # force the use of the upstream constraints for the pip_install role
     # to execute properly when the apt source configuration playbook

@@ -38,8 +38,12 @@ export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 # As container artifacts are built after apt & python artifacts,
 # they should be used if they are available.
-export ENABLE_ARTIFACTS_APT="yes"
-export ENABLE_ARTIFACTS_PYT="yes"
+if apt_artifacts_available; then
+  export ENABLE_ARTIFACTS_APT="yes"
+fi
+if python_artifacts_available; then
+  export ENABLE_ARTIFACTS_PYT="yes"
+fi
 
 ## Main ----------------------------------------------------------------------
 
@@ -96,7 +100,7 @@ fi
 # right artifacts to use. To ensure that we can still do a PR test
 # when there are no python artifacts, we need to override a few
 # things.
-if ! python_artifacts_available; then
+if [[ "${ENABLE_ARTIFACTS_PYT}" != "yes" ]]; then
     # As there are no wheels available for this release, we will
     # need to enable developer_mode for the role install.
     echo "developer_mode: yes" >> ${OA_OVERRIDES}
@@ -149,7 +153,7 @@ done
 
 # If there are no python artifacts, then the containers built are unlikely
 # to be idempotent, so skip this test.
-if python_artifacts_available; then
+if [[ "${ENABLE_ARTIFACTS_PYT}" == "yes" ]]; then
     # test one container build contents
     openstack-ansible containers/test-built-container.yml
     openstack-ansible containers/test-built-container-idempotency-test.yml | tee /tmp/output.txt; grep -q 'changed=0.*failed=0' /tmp/output.txt && { echo 'Idempotence test: pass';  } || { echo 'Idempotence test: fail' && exit 1; }

@@ -38,8 +38,9 @@ export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
 # As git artifacts are built after apt artifacts,
 # they should be used if they are available.
-export ENABLE_ARTIFACTS_APT="yes"
-export ENABLE_ARTIFACTS_PYT="no"
+if apt_artifacts_available; then
+  export ENABLE_ARTIFACTS_APT="yes"
+fi
 
 ## Main ----------------------------------------------------------------------
 # Run basic setup
