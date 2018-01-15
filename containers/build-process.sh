@@ -34,7 +34,11 @@ export PUSH_TO_MIRROR=${PUSH_TO_MIRROR:-no}
 # know it and use this checkout appropriately.
 export BASE_DIR=${PWD}
 
+# Figure out where this script is being run from
 export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
+
+# Source our functions
+source ${SCRIPT_PATH}/../functions.sh
 
 # As container artifacts are built after apt & python artifacts,
 # they should be used if they are available.
