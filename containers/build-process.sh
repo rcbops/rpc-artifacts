@@ -37,17 +37,10 @@ export BASE_DIR=${PWD}
 # Figure out where this script is being run from
 export SCRIPT_PATH="$(readlink -f $(dirname ${0}))"
 
-# Source our functions
-source ${SCRIPT_PATH}/../functions.sh
-
 # As container artifacts are built after apt & python artifacts,
 # they should be used if they are available.
-if apt_artifacts_available; then
-  export ENABLE_ARTIFACTS_APT="yes"
-fi
-if python_artifacts_available; then
-  export ENABLE_ARTIFACTS_PYT="yes"
-fi
+export ENABLE_ARTIFACTS_APT="yes"
+export ENABLE_ARTIFACTS_PYT="yes"
 
 ## Main ----------------------------------------------------------------------
 

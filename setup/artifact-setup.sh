@@ -46,6 +46,14 @@ popd
 # Source our functions
 source ${SCRIPT_PATH}/../functions.sh
 
+# If are not available then the use of them should be disabled.
+if ! apt_artifacts_available; then
+  export ENABLE_ARTIFACTS_APT="no"
+fi
+if ! python_artifacts_available; then
+  export ENABLE_ARTIFACTS_PYT="no"
+fi
+
 # Prepare the relevant artifacts
 openstack-ansible -i 'localhost,' \
                   -e 'apt_target_group=localhost' \
@@ -60,7 +68,7 @@ openstack-ansible "${BASE_DIR}/playbooks/openstack-ansible-install.yml"
 # Copy the extra-var override file over
 cp ${SCRIPT_PATH}/../user_*.yml /etc/openstack_deploy/
 
-if apt_artifacts_available; then
+if [[ "${ENABLE_ARTIFACTS_APT}" == "yes" ]]; then
   # Prevent the AIO bootstrap from re-implementing
   # the updates, backports and UCA sources.
   export BOOTSTRAP_OPTS='{ "bootstrap_host_apt_distribution_suffix_list": [], "uca_enable": "False" }'
