@@ -167,7 +167,7 @@
 
     - name: Create lxc image
       shell: |
-        tar -Jcf rootfs.tar.xz /var/lib/lxc/LXC_NAME/rootfs
+        tar -Jcf rootfs.tar.xz -C /var/lib/lxc/LXC_NAME/rootfs .
       args:
         chdir: "{{ image_path }}"
         creates: "{{ image_path }}/rootfs.tar.xz"
@@ -175,7 +175,7 @@
 
     - name: Create lxc image meta
       shell: |
-        tar -Jcf meta.tar.xz {{ lxc_container_cache_path }}/{{ lxc_index_path }}/default/{build_id,config,config-user,create-message,excludes-user,expiry,templates}
+        tar -Jcf meta.tar.xz -C {{ lxc_container_cache_path }}/{{ lxc_index_path }}/default {build_id,config,config-user,create-message,excludes-user,expiry,templates}
       args:
         chdir: "{{ image_path }}"
         creates: "{{ image_path }}/meta.tar.xz"
