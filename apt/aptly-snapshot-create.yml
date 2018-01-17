@@ -57,7 +57,7 @@
   with_items: "{{ aptly_existing_snapshots_list.stdout_lines }}"
   when:
     - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
-    - "item.find('^miko-{{ rpc_release }}-{{ distribution_release }}') != -1"
+    - "item | match('^miko-{{ rpc_release }}-{{ distribution_release }}.*')"
   failed_when: false
 
 - name: Delete old snapshots for this distro/artifacts version
