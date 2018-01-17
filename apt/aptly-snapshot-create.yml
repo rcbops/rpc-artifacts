@@ -27,14 +27,20 @@
   register: aptly_repo_list
   changed_when: false
 
-- name: Prepare re-building of snapshots (generated snapshots list)
-  shell: "aptly snapshot list -raw"
+- name: Fetch snapshot list
+  shell: |
+    aptly snapshot list -raw | grep "{{ rpc_release }}"
+  args:
+    executable: /bin/bash
   register: aptly_existing_snapshots_list
   failed_when: false
   changed_when: false
 
-- name: Prepare re-building of snapshots (published snapshot list)
-  shell: "aptly publish list -raw"
+- name: Fetch published list
+  shell: |
+    aptly publish list -raw | grep "{{ rpc_release }}-{{ distribution_release }}$"
+  args:
+    executable: /bin/bash
   register: aptly_existing_published_snapshots_list
   failed_when: false
   changed_when: false
@@ -44,8 +50,6 @@
   with_items: "{{ aptly_existing_published_snapshots_list.stdout_lines }}"
   when:
     - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
-    - "item.find('{{ rpc_release }}') != -1"
-    - "item.find('{{ distribution_release }}') != -1"
   failed_when: false
 
 - name: Delete old merged snapshots for this distro/artifacts version
@@ -53,7 +57,7 @@
   with_items: "{{ aptly_existing_snapshots_list.stdout_lines }}"
   when:
     - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
-    - "item.find('miko-{{ rpc_release }}-{{ distribution_release }}') != -1"
+    - "item.find('^miko-{{ rpc_release }}-{{ distribution_release }}') != -1"
   failed_when: false
 
 - name: Delete old snapshots for this distro/artifacts version
@@ -61,8 +65,7 @@
   with_items: "{{ aptly_existing_snapshots_list.stdout_lines }}"
   when:
     - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
-    - "item.find('slushie-{{ rpc_release }}') != -1"
-    - "item.find('{{ distribution_release }}') != -1 or item.find('ALL') != -1"
+    - "item | match('^slushie-{{ rpc_release }}-[a-zA-z]+-.*-({{ distribution_release }}|ALL)$')"
   failed_when: false
 
 - name: Froze the mirrors/repos by snapshot creation
