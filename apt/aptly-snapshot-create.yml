@@ -65,7 +65,7 @@
   with_items: "{{ aptly_existing_snapshots_list.stdout_lines }}"
   when:
     - "lookup('ENV','RECREATE_SNAPSHOTS') | bool"
-    - "item | match('^slushie-{{ rpc_release }}-[a-zA-z]+-.*-({{ distribution_release }}|ALL)$')"
+    - "item | match('^slushie-{{ rpc_release }}-[a-zA-z]+-.*({{ distribution_release }}|ALL)$')"
   failed_when: false
 
 - name: Froze the mirrors/repos by snapshot creation
