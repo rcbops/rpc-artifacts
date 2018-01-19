@@ -99,7 +99,7 @@ aptly_miko_mapping:
   r16:
     xenial:
       - "slushie-{{ rpc_release }}-ubuntu-updates-xenial"
-      - "slushie-{{ rpc_release }}-uca-ocata-updates-xenial"
+      - "slushie-{{ rpc_release }}-uca-pike-updates-xenial"
       - "slushie-{{ rpc_release }}-mariadb-10.1-xenial"
       - "slushie-{{ rpc_release }}-percona-xenial"
       - "slushie-{{ rpc_release }}-erlang-xenial"
@@ -160,6 +160,7 @@ aptly_mirrors:
       server: "hkp://keyserver.ubuntu.com:80"
       keyring: "trustedkeys.gpg"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: ubuntu-backports-trusty
     archive_url: http://mirror.rackspace.com/ubuntu
     distribution: trusty-backports
@@ -178,6 +179,7 @@ aptly_mirrors:
       server: "hkp://keyserver.ubuntu.com:80"
       keyring: "trustedkeys.gpg"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: ubuntu-updates-xenial
     archive_url: http://mirror.rackspace.com/ubuntu
     distribution: xenial-updates
@@ -194,6 +196,7 @@ aptly_mirrors:
       server: "hkp://keyserver.ubuntu.com:80"
       keyring: "trustedkeys.gpg"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: uca-mitaka-updates-trusty
     archive_url: http://ubuntu-cloud.archive.canonical.com/ubuntu
     distribution: trusty-updates/mitaka
@@ -210,6 +213,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: uca-newton-updates-xenial
     archive_url: http://ubuntu-cloud.archive.canonical.com/ubuntu
     distribution: xenial-updates/newton
@@ -225,6 +229,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: uca-ocata-updates-xenial
     archive_url: http://ubuntu-cloud.archive.canonical.com/ubuntu
     distribution: xenial-updates/ocata
@@ -240,6 +245,23 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
+  - name: uca-pike-updates-xenial
+    archive_url: http://ubuntu-cloud.archive.canonical.com/ubuntu
+    distribution: xenial-updates/pike
+    component1:
+      - main
+    state: "present"
+    gpg:
+      key: "EC4926EA"
+      server: "hkp://keyserver.ubuntu.com:80"
+      keyring: "trustedkeys.gpg"
+    create_flags:
+      - "-keyring='trustedkeys.gpg'"
+    update_flags:
+      - "-keyring='trustedkeys.gpg'"
+    do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: mariadb-10.0-trusty
     archive_url: http://mirror.rackspace.com/mariadb/repo/10.0/ubuntu
     distribution: trusty
@@ -256,6 +278,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: mariadb-10.0-xenial
     archive_url: http://mirror.rackspace.com/mariadb/repo/10.0/ubuntu
     distribution: xenial
@@ -272,6 +295,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: mariadb-10.1-xenial
     archive_url: http://mirror.rackspace.com/mariadb/repo/10.1/ubuntu
     distribution: xenial
@@ -288,6 +312,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: percona-trusty
     archive_url: http://repo.percona.com/apt
     distribution: trusty
@@ -303,6 +328,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: percona-xenial
     archive_url: http://repo.percona.com/apt
     distribution: xenial
@@ -318,6 +344,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: haproxy-trusty
     archive_url: http://ppa.launchpad.net/vbernat/haproxy-1.5/ubuntu
     distribution: trusty
@@ -333,6 +360,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   # Rabbitmq:
   # Got the key from:
   # wget https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
@@ -352,6 +380,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   # Erlang (used by RabbitMQ):
   # Got the key from:
   # wget https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc
@@ -371,6 +400,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-logstash-2.3-ALL
     archive_url: http://packages.elastic.co/logstash/2.3/debian
     distribution: stable
@@ -386,6 +416,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-kibana-4.5-ALL
     archive_url: http://packages.elastic.co/kibana/4.5/debian
     distribution: stable
@@ -401,6 +432,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-beats-ALL
     archive_url: http://packages.elastic.co/beats/apt
     distribution: stable
@@ -416,6 +448,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-es-1.7-ALL
     archive_url: http://packages.elastic.co/elasticsearch/1.7/debian
     distribution: stable
@@ -431,6 +464,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-es-2.x-ALL
     archive_url: http://packages.elastic.co/elasticsearch/2.x/debian
     distribution: stable
@@ -446,6 +480,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-logstash-5.5-ALL
     archive_url: http://artifacts.elastic.co/packages/5.x/apt
     distribution: stable
@@ -461,6 +496,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-kibana-5.5-ALL
     archive_url: http://artifacts.elastic.co/packages/5.x/apt
     distribution: stable
@@ -476,6 +512,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-beats-5.5-ALL
     archive_url: http://artifacts.elastic.co/packages/5.x/apt
     distribution: stable
@@ -491,6 +528,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: elastic-es-5.5-ALL
     archive_url: http://artifacts.elastic.co/packages/5.x/apt
     distribution: stable
@@ -506,6 +544,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: hwraid-trusty
     archive_url: http://hwraid.le-vert.net/ubuntu/
     distribution: trusty
@@ -521,6 +560,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: hwraid-xenial
     archive_url: http://hwraid.le-vert.net/ubuntu/
     distribution: xenial
@@ -536,6 +576,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: rax-maas-trusty
     archive_url: http://stable.packages.cloudmonitoring.rackspace.com/ubuntu-14.04-x86_64/
     distribution: cloudmonitoring
@@ -551,6 +592,7 @@ aptly_mirrors:
     update_flags:
       - "-keyring='trustedkeys.gpg'"
     do_update: "{{ aptly_mirror_do_updates }}"
+
   - name: rax-maas-xenial
     archive_url: http://stable.packages.cloudmonitoring.rackspace.com/ubuntu-16.04-x86_64/
     distribution: cloudmonitoring
