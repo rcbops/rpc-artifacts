@@ -228,7 +228,7 @@
     - name: patch the current list with the new artifact
       lineinfile:
         dest: "/opt/list"
-        regexp: "^{{ lxc_index_entry }};{{ image_name }}-{{ rpc_release }}"
+        regexp: "^{{ lxc_index_entry }};{{ image_name }}-{{ rpc_release }};"
         line: "{{ lookup('file', built_container_artifact_metadata_file ) }}"
 
     - name: Remove the metadata file
